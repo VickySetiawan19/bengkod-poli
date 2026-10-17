@@ -1,80 +1,80 @@
-<x-layouts.app title="Edit Poli">
+<x-layouts.app title="Edit Poliklinik">
+    <div class="max-w-2xl mx-auto space-y-6">
+        {{-- Header --}}
+        <div class="flex items-center gap-3">
+            <a href="{{ route('polis.index') }}"
+                class="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-200 transition">
+                <i class="fas fa-arrow-left text-sm"></i>
+            </a>
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-pen-to-square text-primary"></i> Edit Poliklinik
+                </h1>
+                <p class="text-xs text-slate-500 mt-0.5">
+                    Perbarui nama atau deskripsi informasi layanan poliklinik.
+                </p>
+            </div>
+        </div>
 
-    {{-- Header --}}
-    <div class="flex items-center gap-3 mb-6">
-        <a href="{{ route('polis.index') }}" class="inline-flex items-center justify-center w-9 h-9 
-                  rounded-lg bg-slate-100 text-slate-500 
-                  hover:bg-slate-200 transition">
-            <i class="fas fa-arrow-left text-sm"></i>
-        </a>
+        {{-- Card Form --}}
+        <div class="card bg-base-100 shadow-sm rounded-2xl border border-slate-200/80">
+            <div class="card-body p-6 sm:p-8">
+                <form action="{{ route('polis.update', $poli->id) }}" method="POST" class="space-y-5">
+                    @csrf
+                    @method('PUT')
 
-        <h2 class="text-2xl font-bold text-slate-800">
-            Edit Poli
-        </h2>
-    </div>
+                    {{-- Nama Poli --}}
+                    <div class="form-control">
+                        <label class="label pb-1">
+                            <span class="text-sm font-bold text-slate-700">
+                                Nama Poliklinik <span class="text-red-500">*</span>
+                            </span>
+                        </label>
+                        <input type="text" 
+                               name="nama_poli" 
+                               value="{{ old('nama_poli', $poli->nama_poli) }}"
+                               placeholder="Masukkan nama poli..."
+                               class="input input-bordered w-full rounded-xl text-sm @error('nama_poli') input-error @enderror"
+                               required>
+                        @error('nama_poli')
+                            <label class="label pt-1">
+                                <span class="label-text-alt text-red-500 text-xs">{{ $message }}</span>
+                            </label>
+                        @enderror
+                    </div>
 
-    {{-- Card --}}
-    <div class="card bg-base-100 shadow-md rounded-2xl border border-slate-200">
+                    {{-- Keterangan --}}
+                    <div class="form-control">
+                        <label class="label pb-1">
+                            <span class="text-sm font-bold text-slate-700">
+                                Keterangan & Lingkup Pelayanan
+                            </span>
+                        </label>
+                        <textarea name="keterangan" 
+                                  rows="4" 
+                                  placeholder="Deskripsikan layanan kesehatan yang disediakan pada poliklinik ini..."
+                                  class="textarea textarea-bordered w-full rounded-xl text-sm leading-relaxed resize-none @error('keterangan') textarea-error @enderror">{{ old('keterangan', $poli->keterangan) }}</textarea>
+                        @error('keterangan')
+                            <label class="label pt-1">
+                                <span class="label-text-alt text-red-500 text-xs">{{ $message }}</span>
+                            </label>
+                        @enderror
+                    </div>
 
-        <div class="card-body p-8">
-
-            <form action="{{ route('polis.update', $poli->id) }}" method="POST">
-                @csrf
-                @method('PUT')
-
-                {{-- Nama Poli --}}
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">
-                        Nama Poli <span class="text-red-500">*</span>
-                    </label>
-
-                    <input type="text" name="nama_poli" value="{{ old('nama_poli', $poli->nama_poli) }}"
-                        placeholder="Masukkan nama poli..."
-                        class="w-full px-4 py-2 rounded-lg border-2 border-slate-300 
-                               focus:border-primary focus:outline-none
-                               @error('nama_poli') border-red-500 @enderror"
-                        required>
-
-                    @error('nama_poli')
-                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Keterangan --}}
-                <div class="mb-8">
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">
-                        Keterangan <span class="text-red-500">*</span>
-                    </label>
-
-                    <textarea name="keterangan" rows="4" placeholder="Masukkan keterangan poli..."
-                        class="w-full px-4 py-2 rounded-lg border-2 border-slate-300 
-                               focus:border-primary focus:outline-none
-                               @error('keterangan') border-red-500 @enderror"
-                        required>{{ old('keterangan', $poli->keterangan) }}</textarea>
-
-                    @error('keterangan')
-                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                {{-- Button --}}
-                <div class="flex gap-3">
-                    <button type="submit"
-                        class="px-6 py-2.5 rounded-lg bg-primary hover:bg-primary/90 
-                               text-white font-semibold text-sm transition">
-                        <i class="fas fa-save mr-1"></i> Simpan
-                    </button>
-
-                    <a href="{{ route('polis.index') }}"
-                        class="px-6 py-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 
-                               text-slate-600 font-semibold text-sm transition">
-                        Batal
-                    </a>
-                </div>
-
-            </form>
-
+                    {{-- Buttons --}}
+                    <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                        <a href="{{ route('polis.index') }}"
+                            class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-sm font-semibold transition">
+                            Batal
+                        </a>
+                        <button type="submit"
+                            class="btn btn-primary rounded-xl text-sm font-semibold gap-2 shadow-sm">
+                            <i class="fas fa-floppy-disk"></i>
+                            Perbarui Poli
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-
 </x-layouts.app>
