@@ -11,12 +11,6 @@
             </div>
         </div>
 
-        @if(session('success'))
-            <div class="alert alert-success shadow-sm text-sm">
-                <i class="fas fa-circle-check"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-        @endif
 
         {{-- Status Filter Tabs --}}
         <div class="tabs tabs-boxed bg-base-200 p-1 w-fit rounded-xl">

@@ -9,12 +9,6 @@
             </p>
         </div>
 
-        @if(session('error'))
-            <div class="alert alert-error shadow-sm text-sm">
-                <i class="fas fa-circle-exclamation"></i>
-                <span>{{ session('error') }}</span>
-            </div>
-        @endif
 
         <div class="card bg-base-100 shadow border border-base-200">
             <div class="card-body p-0">

@@ -9,19 +9,6 @@
             </p>
         </div>
 
-        @if(session('success'))
-            <div class="alert alert-success shadow-sm text-sm">
-                <i class="fas fa-circle-check"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div class="alert alert-error shadow-sm text-sm">
-                <i class="fas fa-circle-exclamation"></i>
-                <span>{{ session('error') }}</span>
-            </div>
-        @endif
 
         @if($errors->any())
             <div class="alert alert-error shadow-sm text-sm">

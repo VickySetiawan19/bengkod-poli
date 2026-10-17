@@ -19,12 +19,6 @@
             @endif
         </div>
 
-        @if(session('success'))
-            <div class="alert alert-success shadow-sm text-sm">
-                <i class="fas fa-circle-check"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-        @endif
 
         <div class="card bg-base-100 shadow border border-base-200">
             <div class="card-body p-4 sm:p-6 divide-y divide-base-200">

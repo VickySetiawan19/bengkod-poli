@@ -9,12 +9,6 @@
             </p>
         </div>
 
-        @if(session('success'))
-            <div class="alert alert-success shadow-sm text-sm">
-                <i class="fas fa-circle-check"></i>
-                <span>{{ session('success') }}</span>
-            </div>
-        @endif
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             {{-- User Details Card --}}
