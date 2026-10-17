@@ -41,14 +41,8 @@
                         <span class="font-bold text-sm text-base-content">{{ $periksa->tgl_periksa ? date('d F Y', strtotime($periksa->tgl_periksa)) : '-' }}</span>
                     </div>
                     <div>
-                        <span class="text-base-content/50 block">Status Pembayaran:</span>
-                        @if($periksa->status_pembayaran === 'lunas')
-                            <span class="badge badge-success badge-sm font-bold">Lunas</span>
-                        @elseif($periksa->status_pembayaran === 'menunggu_verifikasi')
-                            <span class="badge badge-warning badge-sm font-bold">Menunggu Verifikasi</span>
-                        @else
-                            <span class="badge badge-error badge-sm font-bold">Belum Bayar</span>
-                        @endif
+                        <span class="text-base-content/50 block mb-1">Status Pembayaran:</span>
+                        <x-badge.status :status="$periksa->status_pembayaran" />
                     </div>
                     <div>
                         <span class="text-base-content/50 block">Keluhan Anda:</span>

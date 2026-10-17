@@ -16,13 +16,13 @@
                     <table class="table w-full">
                         <thead class="bg-base-200/60 text-xs uppercase tracking-wider text-base-content/70">
                             <tr>
-                                <th class="px-6 py-4">No. Antrian</th>
-                                <th class="px-6 py-4">Nama Poli</th>
-                                <th class="px-6 py-4">Dokter Pemeriksa</th>
-                                <th class="px-6 py-4">Hari & Jam Praktik</th>
-                                <th class="px-6 py-4">Keluhan</th>
-                                <th class="px-6 py-4">Status Pemeriksaan</th>
-                                <th class="px-6 py-4 text-right">Aksi</th>
+                                <th class="px-6 py-4 whitespace-nowrap">No. Antrian</th>
+                                <th class="px-6 py-4 whitespace-nowrap">Nama Poli</th>
+                                <th class="px-6 py-4 whitespace-nowrap min-w-[150px]">Dokter Pemeriksa</th>
+                                <th class="px-6 py-4 whitespace-nowrap min-w-[140px]">Hari & Jam Praktik</th>
+                                <th class="px-6 py-4 min-w-[140px]">Keluhan</th>
+                                <th class="px-6 py-4 whitespace-nowrap">Status Pemeriksaan</th>
+                                <th class="px-6 py-4 text-right whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-base-200 text-sm">
@@ -34,44 +34,36 @@
                                     $periksa = $r->periksa;
                                 @endphp
                                 <tr class="hover:bg-base-50/50 transition">
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="text-lg font-black font-mono text-primary">
                                             #{{ $r->no_antrian }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <span class="badge badge-primary badge-outline font-semibold">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="badge badge-primary badge-outline font-semibold whitespace-nowrap">
                                             {{ $poli->nama_poli ?? 'Poliklinik' }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 font-bold text-base-content">
+                                    <td class="px-6 py-4 font-bold text-base-content whitespace-nowrap">
                                         Dr. {{ $dokter->nama ?? '-' }}
                                     </td>
-                                    <td class="px-6 py-4 text-xs">
-                                        <span class="font-semibold block">{{ $jadwal->hari ?? '-' }}</span>
-                                        <span class="text-base-content/60">{{ date('H:i', strtotime($jadwal->jam_mulai)) }} - {{ date('H:i', strtotime($jadwal->jam_selesai)) }} WIB</span>
+                                    <td class="px-6 py-4 text-xs whitespace-nowrap">
+                                        <span class="font-semibold block whitespace-nowrap">{{ $jadwal->hari ?? '-' }}</span>
+                                        <span class="text-base-content/60 whitespace-nowrap">{{ date('H:i', strtotime($jadwal->jam_mulai)) }} - {{ date('H:i', strtotime($jadwal->jam_selesai)) }} WIB</span>
                                     </td>
                                     <td class="px-6 py-4 text-xs max-w-xs text-base-content/70">
                                         {{ $r->keluhan }}
                                     </td>
-                                    <td class="px-6 py-4">
-                                        @if($periksa || $r->status_periksa === 'selesai')
-                                            <span class="badge badge-success badge-sm font-semibold gap-1">
-                                                <i class="fas fa-check-circle text-xs"></i> Sudah Diperiksa
-                                            </span>
-                                        @else
-                                            <span class="badge badge-warning badge-sm font-semibold gap-1">
-                                                <i class="fas fa-hourglass-half text-xs"></i> Menunggu Panggilan
-                                            </span>
-                                        @endif
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <x-badge.status :status="$periksa || $r->status_periksa === 'selesai' ? 'selesai' : 'menunggu'" />
                                     </td>
-                                    <td class="px-6 py-4 text-right">
+                                    <td class="px-6 py-4 text-right whitespace-nowrap">
                                         @if($periksa || $r->status_periksa === 'selesai')
-                                            <a href="{{ route('pasien.riwayat.detail', $r->id) }}" class="btn btn-sm btn-primary text-white gap-1 shadow-sm">
+                                            <a href="{{ route('pasien.riwayat.detail', $r->id) }}" class="btn btn-xs btn-primary rounded-lg text-white font-medium gap-1 shadow-2xs whitespace-nowrap">
                                                 <i class="fas fa-file-lines text-xs"></i> Detail
                                             </a>
                                         @else
-                                            <span class="text-xs text-base-content/40 italic">Belum diperiksa</span>
+                                            <span class="text-xs text-base-content/40 italic whitespace-nowrap">Belum diperiksa</span>
                                         @endif
                                     </td>
                                 </tr>

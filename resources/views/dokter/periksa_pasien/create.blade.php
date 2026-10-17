@@ -108,8 +108,8 @@
                                         <div class="font-bold text-sm text-base-content">{{ $obat->nama_obat }}</div>
                                         <div class="text-xs text-base-content/50">{{ $obat->kemasan ?? 'Tablet/Sirup' }}</div>
                                         <div class="flex items-center justify-between mt-1 pt-1 border-t border-base-200">
-                                            <span class="font-bold text-xs text-primary">Rp {{ number_format($obat->harga, 0, ',', '.') }}</span>
-                                            <span class="badge badge-xs {{ $obat->stok > 10 ? 'badge-success' : 'badge-warning' }}">
+                                            <span class="font-bold text-xs text-primary font-mono">Rp {{ number_format($obat->harga, 0, ',', '.') }}</span>
+                                            <span class="badge badge-xs rounded-full {{ $obat->stok > 10 ? 'badge-success text-white' : 'badge-warning text-slate-900' }} font-semibold whitespace-nowrap shadow-2xs">
                                                 Stok: {{ $obat->stok }}
                                             </span>
                                         </div>
@@ -147,10 +147,10 @@
 
                     {{-- Submit Buttons --}}
                     <div class="flex items-center justify-end gap-3 pt-2">
-                        <a href="{{ route('periksa-pasien.index') }}" class="btn btn-ghost">
+                        <a href="{{ route('periksa-pasien.index') }}" class="btn btn-ghost rounded-xl font-semibold">
                             Batal
                         </a>
-                        <button type="submit" class="btn btn-primary gap-2">
+                        <button type="submit" class="btn btn-primary rounded-xl text-white font-bold gap-2 shadow-sm hover:shadow transition active:scale-[0.98] px-6">
                             <i class="fas fa-floppy-disk"></i> Simpan Hasil Pemeriksaan
                         </button>
                     </div>

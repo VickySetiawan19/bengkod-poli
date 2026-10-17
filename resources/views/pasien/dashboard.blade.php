@@ -89,8 +89,8 @@
                                 @endif
                             </div>
                             @if($periksaAktif && $periksaAktif->status_pembayaran !== 'lunas')
-                                <a href="{{ route('pasien.pembayaran.index') }}" class="btn btn-warning btn-xs font-bold gap-1">
-                                    <i class="fas fa-wallet"></i> Bayar Sekarang &rarr;
+                                <a href="{{ route('pasien.pembayaran.index') }}" class="btn btn-warning btn-xs rounded-full font-bold gap-1 shadow-2xs whitespace-nowrap active:scale-[0.98] transition">
+                                    <i class="fas fa-wallet text-[11px]"></i> Bayar Sekarang &rarr;
                                 </a>
                             @endif
                         </div>

@@ -5,7 +5,8 @@
 
 /* 2. Custom Theme Variables & Fonts */
 @theme {
-    --font-sans: 'Figtree', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'Plus Jakarta Sans', 'Figtree', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     --font-serif: 'Instrument Serif', serif;
     --sidebar-w: 260px;
 }

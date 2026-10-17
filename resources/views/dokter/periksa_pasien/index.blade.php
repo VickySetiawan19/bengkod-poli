@@ -50,53 +50,45 @@
                     <table class="table w-full">
                         <thead class="bg-base-200/60 text-xs uppercase tracking-wider text-base-content/70">
                             <tr>
-                                <th class="px-6 py-4">No. Antrian</th>
-                                <th class="px-6 py-4">Nama Pasien</th>
-                                <th class="px-6 py-4">Jadwal Praktik</th>
-                                <th class="px-6 py-4">Keluhan</th>
-                                <th class="px-6 py-4">Status</th>
-                                <th class="px-6 py-4 text-right">Aksi</th>
+                                <th class="px-6 py-4 whitespace-nowrap">No. Antrian</th>
+                                <th class="px-6 py-4 whitespace-nowrap min-w-[160px]">Nama Pasien</th>
+                                <th class="px-6 py-4 whitespace-nowrap min-w-[140px]">Jadwal Praktik</th>
+                                <th class="px-6 py-4 min-w-[140px]">Keluhan</th>
+                                <th class="px-6 py-4 whitespace-nowrap">Status</th>
+                                <th class="px-6 py-4 text-right whitespace-nowrap">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-base-200 text-sm">
                             @forelse($antrians as $antrian)
                                 @php $pasien = $antrian->pasien; @endphp
                                 <tr class="hover:bg-base-50/50 transition">
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4 whitespace-nowrap">
                                         <span class="text-lg font-black text-primary font-mono">
                                             #{{ $antrian->no_antrian }}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <div class="font-bold text-base-content">{{ $pasien->nama ?? '-' }}</div>
-                                        <div class="text-xs text-base-content/50 font-mono">RM: {{ $pasien->no_rm ?? '-' }} | Telp: {{ $pasien->no_hp ?? '-' }}</div>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-bold text-base-content whitespace-nowrap">{{ $pasien->nama ?? '-' }}</div>
+                                        <div class="text-xs text-base-content/50 font-mono whitespace-nowrap">RM: {{ $pasien->no_rm ?? '-' }} | Telp: {{ $pasien->no_hp ?? '-' }}</div>
                                     </td>
-                                    <td class="px-6 py-4 text-xs">
-                                        <span class="font-semibold block">{{ $antrian->jadwalPeriksa->hari ?? '-' }}</span>
-                                        <span class="text-base-content/60">{{ date('H:i', strtotime($antrian->jadwalPeriksa->jam_mulai)) }} - {{ date('H:i', strtotime($antrian->jadwalPeriksa->jam_selesai)) }} WIB</span>
+                                    <td class="px-6 py-4 text-xs whitespace-nowrap">
+                                        <span class="font-semibold block whitespace-nowrap">{{ $antrian->jadwalPeriksa->hari ?? '-' }}</span>
+                                        <span class="text-base-content/60 whitespace-nowrap">{{ date('H:i', strtotime($antrian->jadwalPeriksa->jam_mulai)) }} - {{ date('H:i', strtotime($antrian->jadwalPeriksa->jam_selesai)) }} WIB</span>
                                     </td>
                                     <td class="px-6 py-4 max-w-xs text-xs text-base-content/80">
                                         {{ $antrian->keluhan }}
                                     </td>
-                                    <td class="px-6 py-4">
-                                        @if($antrian->status_periksa === 'selesai' || $antrian->periksa)
-                                            <span class="badge badge-success badge-sm font-semibold gap-1">
-                                                <i class="fas fa-check-circle text-xs"></i> Selesai
-                                            </span>
-                                        @else
-                                            <span class="badge badge-warning badge-sm font-semibold gap-1">
-                                                <i class="fas fa-hourglass-half text-xs"></i> Menunggu
-                                            </span>
-                                        @endif
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <x-badge.status :status="$antrian->status_periksa === 'selesai' || $antrian->periksa ? 'selesai' : 'menunggu'" />
                                     </td>
-                                    <td class="px-6 py-4 text-right">
+                                    <td class="px-6 py-4 text-right whitespace-nowrap">
                                         @if($antrian->periksa)
-                                            <a href="{{ route('riwayat-pasien.detail', $antrian->periksa->id) }}" class="btn btn-xs btn-outline gap-1">
+                                            <a href="{{ route('riwayat-pasien.detail', $antrian->periksa->id) }}" class="btn btn-xs btn-outline rounded-lg gap-1 whitespace-nowrap">
                                                 <i class="fas fa-file-lines"></i> Hasil Periksa
                                             </a>
                                         @else
-                                            <a href="{{ route('periksa-pasien.create', $antrian->id) }}" class="btn btn-sm btn-primary text-white gap-1 shadow-sm">
-                                                <i class="fas fa-stethoscope"></i> Periksa Pasien
+                                            <a href="{{ route('periksa-pasien.create', $antrian->id) }}" class="btn btn-xs btn-primary rounded-lg text-white font-medium gap-1.5 shadow-2xs whitespace-nowrap hover:shadow transition">
+                                                <i class="fas fa-stethoscope text-[11px]"></i> Periksa Pasien
                                             </a>
                                         @endif
                                     </td>

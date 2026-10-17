@@ -66,20 +66,12 @@
                                 {{ \Carbon\Carbon::parse($jadwal->jam_selesai)->format('H:i') }} WIB
                             </td>
 
-                            <td class="px-6 py-4 text-center font-bold text-indigo-600 text-base">
+                            <td class="px-6 py-4 text-center whitespace-nowrap font-mono font-bold text-indigo-600 text-base">
                                 #{{ $jadwal->antrian_sekarang ?? 0 }}
                             </td>
 
-                            <td class="px-6 py-4 text-center">
-                                @if(($jadwal->status ?? 'aktif') === 'aktif')
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
-                                        Aktif
-                                    </span>
-                                @else
-                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-200 text-slate-600">
-                                        Tidak Aktif
-                                    </span>
-                                @endif
+                            <td class="px-6 py-4 text-center whitespace-nowrap">
+                                <x-badge.status :status="$jadwal->status ?? 'aktif'" />
                             </td>
 
                             <td class="px-6 py-4 text-right">

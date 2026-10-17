@@ -45,13 +45,13 @@
                     <table class="table w-full">
                         <thead class="bg-base-200/60 text-xs uppercase tracking-wider text-base-content/70">
                             <tr>
-                                <th class="px-6 py-4">No</th>
-                                <th class="px-6 py-4">Poli & Dokter</th>
-                                <th class="px-6 py-4">Tgl Periksa</th>
-                                <th class="px-6 py-4">Total Tagihan</th>
-                                <th class="px-6 py-4">Status Pembayaran</th>
-                                <th class="px-6 py-4">Bukti Pembayaran</th>
-                                <th class="px-6 py-4 text-right">Aksi Upload</th>
+                                <th class="px-6 py-4 whitespace-nowrap">No</th>
+                                <th class="px-6 py-4 whitespace-nowrap min-w-[160px]">Poli & Dokter</th>
+                                <th class="px-6 py-4 whitespace-nowrap">Tgl Periksa</th>
+                                <th class="px-6 py-4 whitespace-nowrap">Total Tagihan</th>
+                                <th class="px-6 py-4 whitespace-nowrap">Status Pembayaran</th>
+                                <th class="px-6 py-4 whitespace-nowrap">Bukti Pembayaran</th>
+                                <th class="px-6 py-4 text-right whitespace-nowrap">Aksi Upload</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-base-200 text-sm">
@@ -62,52 +62,42 @@
                                     $poli = $dokter->poli ?? null;
                                 @endphp
                                 <tr class="hover:bg-base-50/50 transition">
-                                    <td class="px-6 py-4 font-semibold text-base-content/60">
+                                    <td class="px-6 py-4 font-semibold text-base-content/60 whitespace-nowrap">
                                         {{ $tagihans->firstItem() + $index }}
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <div class="font-bold text-base-content">{{ $poli->nama_poli ?? 'Poliklinik' }}</div>
-                                        <div class="text-xs text-base-content/60">Dr. {{ $dokter->nama ?? '-' }}</div>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-bold text-base-content whitespace-nowrap">{{ $poli->nama_poli ?? 'Poliklinik' }}</div>
+                                        <div class="text-xs text-base-content/60 whitespace-nowrap">Dr. {{ $dokter->nama ?? '-' }}</div>
                                     </td>
-                                    <td class="px-6 py-4 text-xs">
+                                    <td class="px-6 py-4 text-xs whitespace-nowrap">
                                         {{ $t->tgl_periksa ? date('d M Y', strtotime($t->tgl_periksa)) : '-' }}
                                     </td>
-                                    <td class="px-6 py-4 font-bold text-base-content text-base font-mono">
+                                    <td class="px-6 py-4 font-bold text-base-content text-base font-mono whitespace-nowrap">
                                         Rp {{ number_format($t->biaya_periksa, 0, ',', '.') }}
                                     </td>
-                                    <td class="px-6 py-4">
-                                        @if($t->status_pembayaran === 'lunas')
-                                            <span class="badge badge-success badge-sm font-semibold gap-1">
-                                                <i class="fas fa-check-circle text-xs"></i> Lunas
-                                            </span>
-                                            <div class="text-[10px] text-base-content/50 mt-0.5">
-                                                {{ $t->tgl_bayar ? date('d/m/Y H:i', strtotime($t->tgl_bayar)) : '' }}
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <x-badge.status :status="$t->status_pembayaran" />
+                                        @if($t->tgl_bayar && $t->status_pembayaran === 'lunas')
+                                            <div class="text-[10px] text-base-content/50 mt-0.5 whitespace-nowrap font-mono">
+                                                {{ date('d/m/Y H:i', strtotime($t->tgl_bayar)) }}
                                             </div>
-                                        @elseif($t->status_pembayaran === 'menunggu_verifikasi')
-                                            <span class="badge badge-warning badge-sm font-semibold gap-1 animate-pulse">
-                                                <i class="fas fa-clock text-xs"></i> Menunggu Verifikasi
-                                            </span>
-                                        @else
-                                            <span class="badge badge-error badge-sm font-semibold gap-1">
-                                                <i class="fas fa-circle-exclamation text-xs"></i> Belum Bayar
-                                            </span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="px-6 py-4 whitespace-nowrap">
                                         @if($t->bukti_pembayaran)
                                             <button type="button" 
                                                     onclick="previewBukti('{{ asset('storage/' . $t->bukti_pembayaran) }}')"
-                                                    class="btn btn-xs btn-outline btn-info gap-1">
-                                                <i class="fas fa-image"></i> Lihat Bukti
+                                                    class="btn btn-xs btn-outline btn-info rounded-lg gap-1 whitespace-nowrap">
+                                                <i class="fas fa-image text-xs"></i> Lihat Bukti
                                             </button>
                                         @else
-                                            <span class="text-xs text-base-content/40 italic">Belum diunggah</span>
+                                            <span class="text-xs text-base-content/40 italic whitespace-nowrap">Belum diunggah</span>
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-right">
+                                    <td class="px-6 py-4 text-right whitespace-nowrap">
                                         @if($t->status_pembayaran === 'lunas')
                                             <span class="text-xs text-success font-semibold flex items-center justify-end gap-1">
-                                                <i class="fas fa-circle-check"></i> Selesai
+                                                <i class="fas fa-circle-check text-xs"></i> Selesai
                                             </span>
                                         @else
                                             {{-- Upload Form --}}
@@ -116,9 +106,9 @@
                                                 <input type="file" 
                                                        name="bukti_pembayaran" 
                                                        accept="image/*" 
-                                                       class="file-input file-input-bordered file-input-xs w-44" 
+                                                       class="file-input file-input-bordered file-input-xs w-44 rounded-lg" 
                                                        required>
-                                                <button type="submit" class="btn btn-xs btn-primary gap-1" title="Unggah Bukti">
+                                                <button type="submit" class="btn btn-xs btn-primary rounded-lg text-white font-medium gap-1 shadow-2xs whitespace-nowrap" title="Unggah Bukti">
                                                     <i class="fas fa-upload text-[10px]"></i> {{ $t->bukti_pembayaran ? 'Ganti' : 'Upload' }}
                                                 </button>
                                             </form>

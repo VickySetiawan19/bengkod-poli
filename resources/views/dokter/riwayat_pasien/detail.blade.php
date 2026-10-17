@@ -29,14 +29,8 @@
                         <span class="text-xs font-mono text-primary font-semibold">No. RM: {{ $pasien->no_rm ?? '-' }}</span>
                     </div>
                     <div class="text-right">
-                        <span class="text-xs text-base-content/50 block">Status Pembayaran:</span>
-                        @if($periksa->status_pembayaran === 'lunas')
-                            <span class="badge badge-success font-semibold">Lunas</span>
-                        @elseif($periksa->status_pembayaran === 'menunggu_verifikasi')
-                            <span class="badge badge-warning font-semibold">Menunggu Verifikasi</span>
-                        @else
-                            <span class="badge badge-ghost font-semibold">Belum Bayar</span>
-                        @endif
+                        <span class="text-xs text-base-content/50 block mb-1">Status Pembayaran:</span>
+                        <x-badge.status :status="$periksa->status_pembayaran" size="sm" />
                     </div>
                 </div>
 

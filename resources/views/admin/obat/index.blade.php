@@ -54,12 +54,12 @@
                                 {{ $obat->kemasan ?? '-' }}
                             </td>
 
-                            <td class="px-6 py-4 font-semibold text-slate-800">
+                            <td class="px-6 py-4 font-semibold text-slate-800 font-mono whitespace-nowrap">
                                 Rp {{ number_format($obat->harga, 0, ',', '.') }}
                             </td>
 
-                            <td class="px-6 py-4">
-                                <span class="badge {{ ($obat->stok ?? 0) > 10 ? 'badge-success' : (($obat->stok ?? 0) > 0 ? 'badge-warning' : 'badge-error') }} badge-sm font-semibold">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="badge {{ ($obat->stok ?? 0) > 10 ? 'badge-success text-white' : (($obat->stok ?? 0) > 0 ? 'badge-warning text-slate-900' : 'badge-error text-white') }} badge-sm font-semibold rounded-full whitespace-nowrap shadow-2xs">
                                     {{ $obat->stok ?? 0 }} unit
                                 </span>
                             </td>
