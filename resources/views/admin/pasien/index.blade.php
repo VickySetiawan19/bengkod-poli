@@ -6,13 +6,19 @@
             Data Pasien
         </h2>
 
-        <a href="{{ route('pasien.create') }}" class="inline-flex items-center gap-2 px-5 py-2.5
-                  bg-primary hover:bg-primary/90
-                  text-white text-sm font-semibold
-                  rounded-xl transition">
-            <i class="fas fa-plus text-xs"></i>
-            Tambah Pasien
-        </a>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('pasien.export') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition shadow-sm">
+                <i class="fas fa-file-excel text-sm"></i>
+                Export Excel
+            </a>
+            <a href="{{ route('pasien.create') }}" class="inline-flex items-center gap-2 px-5 py-2.5
+                      bg-primary hover:bg-primary/90
+                      text-white text-sm font-semibold
+                      rounded-xl transition shadow-sm">
+                <i class="fas fa-plus text-xs"></i>
+                Tambah Pasien
+            </a>
+        </div>
     </div>
 
     {{-- Card --}}
@@ -26,6 +32,7 @@
                     <thead class="bg-slate-50 text-slate-500 uppercase text-xs tracking-wider">
                         <tr>
                             <th class="px-6 py-4">Nama Pasien</th>
+                            <th class="px-6 py-4">No. RM</th>
                             <th class="px-6 py-4">Email</th>
                             <th class="px-6 py-4">No. KTP</th>
                             <th class="px-6 py-4">No. HP</th>
@@ -41,6 +48,10 @@
 
                             <td class="px-6 py-4 font-semibold text-slate-800">
                                 {{ $pasien->nama }}
+                            </td>
+
+                            <td class="px-6 py-4 font-mono font-medium text-xs text-primary">
+                                {{ $pasien->no_rm ?? '-' }}
                             </td>
 
                             <td class="px-6 py-4 text-slate-600">

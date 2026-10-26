@@ -88,4 +88,26 @@ class PasienController extends Controller
             ->with('message', 'Data Pasien berhasil dihapus')
             ->with('type', 'success');
     }
+
+    public function export()
+    {
+        $pasiens = User::where('role', 'pasien')->get();
+
+        $headers = ['No', 'Nama Pasien', 'No. RM', 'Alamat', 'No. KTP', 'No. HP', 'Email'];
+        $rows = [];
+        $no = 1;
+        foreach ($pasiens as $p) {
+            $rows[] = [
+                $no++,
+                $p->nama,
+                $p->no_rm ?? '-',
+                $p->alamat,
+                $p->no_ktp,
+                $p->no_hp,
+                $p->email,
+            ];
+        }
+
+        return \App\Services\ExcelExportService::download('data_pasien_' . date('Ymd_His'), $headers, $rows);
+    }
 }

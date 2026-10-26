@@ -6,10 +6,16 @@
             Data Obat
         </h2>
 
-        <a href="{{ route('obat.create') }}" class="btn bg-[#2d4499] hover:bg-[#1e2d6b] text-white border-none rounded-lg px-5">
-            <i class="fas fa-plus"></i>
-            Tambah Obat
-        </a>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('obat.export') }}" class="btn bg-emerald-600 hover:bg-emerald-700 text-white border-none rounded-lg px-4 gap-2 shadow-sm">
+                <i class="fas fa-file-excel"></i>
+                Export Excel
+            </a>
+            <a href="{{ route('obat.create') }}" class="btn bg-[#2d4499] hover:bg-[#1e2d6b] text-white border-none rounded-lg px-5 gap-2 shadow-sm">
+                <i class="fas fa-plus"></i>
+                Tambah Obat
+            </a>
+        </div>
     </div>
 
     {{-- Alert Error --}}
@@ -33,6 +39,7 @@
                             <th class="px-6 py-4">Nama Obat</th>
                             <th class="px-6 py-4">Kemasan</th>
                             <th class="px-6 py-4">Harga</th>
+                            <th class="px-6 py-4">Stok</th>
                             <th class="px-6 py-4 text-right">Aksi</th>
                         </tr>
                     </thead>
@@ -57,6 +64,12 @@
 
                             <td class="px-6 py-4 font-semibold text-slate-800">
                                 Rp {{ number_format($obat->harga, 0, ',', '.') }}
+                            </td>
+
+                            <td class="px-6 py-4">
+                                <span class="badge {{ ($obat->stok ?? 0) > 10 ? 'badge-success' : (($obat->stok ?? 0) > 0 ? 'badge-warning' : 'badge-error') }} badge-sm font-semibold">
+                                    {{ $obat->stok ?? 0 }} unit
+                                </span>
                             </td>
 
                             <td class="px-6 py-4 text-right">
@@ -85,7 +98,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="4" class="text-center py-14 text-slate-400">
+                            <td colspan="5" class="text-center py-14 text-slate-400">
                                 <i class="fas fa-inbox text-3xl mb-3 block"></i>
                                 Belum ada data obat
                             </td>

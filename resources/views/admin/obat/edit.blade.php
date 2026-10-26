@@ -58,7 +58,7 @@
                 </div>
 
                 {{-- Harga --}}
-                <div class="mb-8">
+                <div class="mb-6">
                     <label class="block text-sm font-semibold text-slate-700 mb-1">
                         Harga (Rp) <span class="text-red-500">*</span>
                     </label>
@@ -72,6 +72,25 @@
                         required>
 
                     @error('harga')
+                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Stok --}}
+                <div class="mb-8">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">
+                        Stok Obat <span class="text-red-500">*</span>
+                    </label>
+
+                    <input type="number" name="stok" value="{{ old('stok', $obat->stok ?? 50) }}"
+                        placeholder="Masukkan jumlah stok obat..."
+                        min="0"
+                        class="w-full px-4 py-2 rounded-lg border-2 border-slate-300 
+                               focus:border-primary focus:outline-none
+                               @error('stok') border-red-500 @enderror"
+                        required>
+
+                    @error('stok')
                     <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                     @enderror
                 </div>

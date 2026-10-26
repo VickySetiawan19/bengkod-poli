@@ -34,6 +34,7 @@ class ObatController extends Controller
             'nama_obat' => 'required|string|max:255',
             'kemasan' => 'nullable|string|max:35',
             'harga' => 'required|numeric|min:0',
+            'stok' => 'nullable|integer|min:0',
         ], [
             'nama_obat.required' => 'Nama obat wajib diisi.',
             'kemasan.max' => 'Kemasan maksimal 35 karakter.',
@@ -41,6 +42,10 @@ class ObatController extends Controller
             'harga.numeric' => 'Harga harus berupa angka.',
             'harga.min' => 'Harga tidak boleh kurang dari 0.',
         ]);
+
+        if (!isset($validated['stok'])) {
+            $validated['stok'] = 50;
+        }
 
         Obat::create($validated);
 
@@ -77,6 +82,7 @@ class ObatController extends Controller
             'nama_obat' => 'required|string|max:255',
             'kemasan' => 'nullable|string|max:35',
             'harga' => 'required|numeric|min:0',
+            'stok' => 'nullable|integer|min:0',
         ], [
             'nama_obat.required' => 'Nama obat wajib diisi.',
             'kemasan.max' => 'Kemasan maksimal 35 karakter.',
@@ -106,5 +112,28 @@ class ObatController extends Controller
             ->with('success', 'Data obat berhasil dihapus!')
             ->with('message', 'Data obat berhasil dihapus!')
             ->with('type', 'success');
+    }
+
+    /**
+     * Export medicine data including stock and price to Excel.
+     */
+    public function export()
+    {
+        $obats = Obat::all();
+
+        $headers = ['No', 'Nama Obat', 'Kemasan', 'Harga (Rp)', 'Stok'];
+        $rows = [];
+        $no = 1;
+        foreach ($obats as $o) {
+            $rows[] = [
+                $no++,
+                $o->nama_obat,
+                $o->kemasan ?? '-',
+                $o->harga,
+                $o->stok ?? 0,
+            ];
+        }
+
+        return \App\Services\ExcelExportService::download('data_obat_' . date('Ymd_His'), $headers, $rows);
     }
 }
