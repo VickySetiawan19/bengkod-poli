@@ -11,10 +11,16 @@
             </p>
         </div>
 
-        <a href="{{ route('jadwal-periksa.create') }}" class="btn bg-[#2d4499] hover:bg-[#1e2d6b] text-white border-none rounded-lg px-5">
-            <i class="fas fa-plus"></i>
-            Tambah Jadwal
-        </a>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('jadwal-periksa.export') }}" class="btn bg-emerald-600 hover:bg-emerald-700 text-white border-none rounded-lg px-4 gap-2 shadow-sm">
+                <i class="fas fa-file-excel"></i>
+                Export Excel
+            </a>
+            <a href="{{ route('jadwal-periksa.create') }}" class="btn bg-[#2d4499] hover:bg-[#1e2d6b] text-white border-none rounded-lg px-5 gap-2 shadow-sm">
+                <i class="fas fa-plus"></i>
+                Tambah Jadwal
+            </a>
+        </div>
     </div>
 
     {{-- Alert Error --}}
@@ -38,6 +44,7 @@
                             <th class="px-6 py-4">Hari</th>
                             <th class="px-6 py-4">Jam Mulai</th>
                             <th class="px-6 py-4">Jam Selesai</th>
+                            <th class="px-6 py-4 text-center">Sedang Dilayani</th>
                             <th class="px-6 py-4 text-center">Status</th>
                             <th class="px-6 py-4 text-right">Aksi</th>
                         </tr>
@@ -67,10 +74,20 @@
                                 {{ \Carbon\Carbon::parse($jadwal->jam_selesai)->format('H:i') }} WIB
                             </td>
 
+                            <td class="px-6 py-4 text-center font-bold text-indigo-600 text-base">
+                                #{{ $jadwal->antrian_sekarang ?? 0 }}
+                            </td>
+
                             <td class="px-6 py-4 text-center">
-                                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
-                                    Aktif
-                                </span>
+                                @if(($jadwal->status ?? 'aktif') === 'aktif')
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                                        Aktif
+                                    </span>
+                                @else
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-200 text-slate-600">
+                                        Tidak Aktif
+                                    </span>
+                                @endif
                             </td>
 
                             <td class="px-6 py-4 text-right">
@@ -99,7 +116,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="text-center py-14 text-slate-400">
+                            <td colspan="6" class="text-center py-14 text-slate-400">
                                 <i class="fas fa-calendar-xmark text-3xl mb-3 block text-slate-300"></i>
                                 Belum ada jadwal periksa yang ditambahkan
                             </td>

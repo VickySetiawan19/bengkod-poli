@@ -49,6 +49,8 @@ class JadwalPeriksaController extends Controller
             'hari' => $request->hari,
             'jam_mulai' => $request->jam_mulai,
             'jam_selesai' => $request->jam_selesai,
+            'status' => $request->status ?? 'aktif',
+            'antrian_sekarang' => 0,
         ]);
 
         return redirect()->route('jadwal-periksa.index')
@@ -87,6 +89,7 @@ class JadwalPeriksaController extends Controller
             'hari' => 'required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
             'jam_mulai' => 'required',
             'jam_selesai' => 'required|after:jam_mulai',
+            'status' => 'nullable|in:aktif,tidak_aktif',
         ], [
             'hari.required' => 'Hari jadwal periksa wajib dipilih.',
             'hari.in' => 'Hari yang dipilih tidak valid.',
@@ -99,6 +102,7 @@ class JadwalPeriksaController extends Controller
             'hari' => $request->hari,
             'jam_mulai' => $request->jam_mulai,
             'jam_selesai' => $request->jam_selesai,
+            'status' => $request->status ?? $jadwal->status,
         ]);
 
         return redirect()->route('jadwal-periksa.index')
@@ -119,5 +123,29 @@ class JadwalPeriksaController extends Controller
             ->with('success', 'Jadwal periksa berhasil dihapus!')
             ->with('message', 'Jadwal periksa berhasil dihapus!')
             ->with('type', 'success');
+    }
+
+    /**
+     * Export doctor schedules to Excel.
+     */
+    public function export()
+    {
+        $jadwals = JadwalPeriksa::where('id_dokter', Auth::id())->get();
+
+        $headers = ['No', 'Hari', 'Jam Mulai', 'Jam Selesai', 'Status', 'Nomor Antrian Sedang Dilayani'];
+        $rows = [];
+        $no = 1;
+        foreach ($jadwals as $j) {
+            $rows[] = [
+                $no++,
+                $j->hari,
+                $j->jam_mulai,
+                $j->jam_selesai,
+                strtoupper($j->status ?? 'AKTIF'),
+                $j->antrian_sekarang ?? 0,
+            ];
+        }
+
+        return \App\Services\ExcelExportService::download('jadwal_periksa_' . date('Ymd_His'), $headers, $rows);
     }
 }
