@@ -3,24 +3,26 @@
     {{-- ================= BRAND ================= --}}
     <div class="px-5 py-5 border-b border-white/10">
         <div class="flex items-center gap-3">
-            <img src="{{ asset('images/logo-bengkot.png') }}" class="w-10 h-10 rounded-xl object-cover">
+            <img src="{{ asset('images/logo-bengkot.png') }}" class="w-10 h-10 rounded-xl object-cover shadow">
 
             <div>
                 <div class="font-bold text-white text-lg leading-tight">
                     Poliklinik
                 </div>
 
-                @if(request()->is('admin*'))
+                @php $userRole = auth()->user()->role ?? (request()->is('admin*') ? 'admin' : (request()->is('dokter*') ? 'dokter' : 'pasien')); @endphp
+
+                @if($userRole === 'admin')
                 <span
                     class="text-[10px] font-bold uppercase tracking-wider bg-indigo-400/20 text-indigo-300 border border-indigo-400/30 px-2 py-0.5 rounded-md">
                     Admin
                 </span>
-                @elseif(request()->is('dokter*'))
+                @elseif($userRole === 'dokter')
                 <span
                     class="text-[10px] font-bold uppercase tracking-wider bg-purple-400/20 text-purple-300 border border-purple-400/30 px-2 py-0.5 rounded-md">
                     Dokter
                 </span>
-                @elseif(request()->is('pasien*'))
+                @elseif($userRole === 'pasien')
                 <span
                     class="text-[10px] font-bold uppercase tracking-wider bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-md">
                     Pasien
@@ -42,7 +44,7 @@
 
 
         {{-- ================= ADMIN ================= --}}
-        @if(request()->is('admin*'))
+        @if($userRole === 'admin')
 
         <p class="text-xs font-bold uppercase tracking-widest text-indigo-400 px-3 mb-3">
             Menu Admin
@@ -80,14 +82,32 @@
                 Manajemen Obat
             </a>
 
+            @php $pendingCount = \App\Models\Periksa::where('status_pembayaran', 'menunggu_verifikasi')->count(); @endphp
+            <a href="{{ route('verifikasi-pembayaran.index') }}"
+                class="{{ $baseLink }} {{ request()->routeIs('verifikasi-pembayaran.*') ? $active : $inactive }} justify-between">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-receipt w-4 text-center"></i>
+                    <span>Verifikasi Bayar</span>
+                </div>
+                @if($pendingCount > 0)
+                    <span class="badge badge-error badge-xs font-bold text-white px-1.5 py-0.5 rounded-full">{{ $pendingCount }}</span>
+                @endif
+            </a>
+
+            <a href="{{ route('profile.edit') }}"
+                class="{{ $baseLink }} {{ request()->routeIs('profile.*') ? $active : $inactive }}">
+                <i class="fas fa-user-gear w-4 text-center"></i>
+                Profil & Password
+            </a>
+
         </div>
         @endif
 
 
         {{-- ================= PASIEN ================= --}}
-        @if(request()->is('pasien*'))
+        @if($userRole === 'pasien')
 
-        <p class="text-xs uppercase tracking-widest text-indigo-400 px-3 mb-3 mt-6">
+        <p class="text-xs uppercase tracking-widest text-amber-400 px-3 mb-3">
             Menu Pasien
         </p>
 
@@ -96,18 +116,35 @@
             <a href="{{ route('pasien.dashboard') }}"
                 class="{{ $baseLink }} {{ request()->routeIs('pasien.dashboard') ? $active : $inactive }}">
                 <i class="fas fa-house-medical w-4 text-center"></i>
-                Dashboard Pasien
+                Dashboard & Antrian
             </a>
 
+            <a href="{{ route('pasien.riwayat.index') }}"
+                class="{{ $baseLink }} {{ request()->routeIs('pasien.riwayat.*') ? $active : $inactive }}">
+                <i class="fas fa-clock-rotate-left w-4 text-center"></i>
+                Riwayat Pendaftaran
+            </a>
+
+            <a href="{{ route('pasien.pembayaran.index') }}"
+                class="{{ $baseLink }} {{ request()->routeIs('pasien.pembayaran.*') ? $active : $inactive }}">
+                <i class="fas fa-wallet w-4 text-center"></i>
+                Pembayaran
+            </a>
+
+            <a href="{{ route('profile.edit') }}"
+                class="{{ $baseLink }} {{ request()->routeIs('profile.*') ? $active : $inactive }}">
+                <i class="fas fa-user-gear w-4 text-center"></i>
+                Profil & Password
+            </a>
 
         </div>
         @endif
 
 
         {{-- ================= DOKTER ================= --}}
-        @if(request()->is('dokter*'))
+        @if($userRole === 'dokter')
 
-        <p class="text-xs uppercase tracking-widest text-indigo-400 px-3 mb-3 mt-6">
+        <p class="text-xs uppercase tracking-widest text-purple-400 px-3 mb-3">
             Menu Dokter
         </p>
 
@@ -125,6 +162,24 @@
                 Jadwal Periksa
             </a>
 
+            <a href="{{ route('periksa-pasien.index') }}"
+                class="{{ $baseLink }} {{ request()->routeIs('periksa-pasien.*') ? $active : $inactive }}">
+                <i class="fas fa-user-check w-4 text-center"></i>
+                Memeriksa Pasien
+            </a>
+
+            <a href="{{ route('riwayat-pasien.index') }}"
+                class="{{ $baseLink }} {{ request()->routeIs('riwayat-pasien.*') ? $active : $inactive }}">
+                <i class="fas fa-clipboard-user w-4 text-center"></i>
+                Riwayat Pasien
+            </a>
+
+            <a href="{{ route('profile.edit') }}"
+                class="{{ $baseLink }} {{ request()->routeIs('profile.*') ? $active : $inactive }}">
+                <i class="fas fa-user-gear w-4 text-center"></i>
+                Profil & Password
+            </a>
+
         </div>
         @endif
 
@@ -136,7 +191,7 @@
         <form method="POST" action="/logout">
             @csrf
             <button type="submit"
-                class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-all">
+                class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-all shadow-sm">
                 <i class="fas fa-right-from-bracket w-4"></i>
                 Keluar
             </button>
