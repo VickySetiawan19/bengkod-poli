@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Poli;
 use App\Models\User;
+use App\Services\ExcelExportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -102,20 +103,16 @@ class DokterController extends Controller
         $dokters = User::where('role', 'dokter')->with('poli')->get();
 
         $headers = ['No', 'Nama Dokter', 'Alamat', 'No. KTP', 'No. HP', 'Poliklinik', 'Email'];
-        $rows = [];
-        $no = 1;
-        foreach ($dokters as $d) {
-            $rows[] = [
-                $no++,
-                $d->nama,
-                $d->alamat,
-                $d->no_ktp,
-                $d->no_hp,
-                $d->poli->nama_poli ?? '-',
-                $d->email,
-            ];
-        }
+        $rows = $dokters->map(fn ($d, $i) => [
+            $i + 1,
+            $d->nama,
+            $d->alamat,
+            $d->no_ktp,
+            $d->no_hp,
+            $d->poli->nama_poli ?? '-',
+            $d->email,
+        ])->all();
 
-        return \App\Services\ExcelExportService::download('data_dokter_' . date('Ymd_His'), $headers, $rows);
+        return ExcelExportService::download('data_dokter_' . date('Ymd_His'), $headers, $rows);
     }
 }

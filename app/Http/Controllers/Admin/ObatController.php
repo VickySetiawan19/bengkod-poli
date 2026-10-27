@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Obat;
+use App\Services\ExcelExportService;
 use Illuminate\Http\Request;
 
 class ObatController extends Controller
@@ -122,18 +123,14 @@ class ObatController extends Controller
         $obats = Obat::all();
 
         $headers = ['No', 'Nama Obat', 'Kemasan', 'Harga (Rp)', 'Stok'];
-        $rows = [];
-        $no = 1;
-        foreach ($obats as $o) {
-            $rows[] = [
-                $no++,
-                $o->nama_obat,
-                $o->kemasan ?? '-',
-                $o->harga,
-                $o->stok ?? 0,
-            ];
-        }
+        $rows = $obats->map(fn ($o, $i) => [
+            $i + 1,
+            $o->nama_obat,
+            $o->kemasan ?? '-',
+            $o->harga,
+            $o->stok ?? 0,
+        ])->all();
 
-        return \App\Services\ExcelExportService::download('data_obat_' . date('Ymd_His'), $headers, $rows);
+        return ExcelExportService::download('data_obat_' . date('Ymd_His'), $headers, $rows);
     }
 }

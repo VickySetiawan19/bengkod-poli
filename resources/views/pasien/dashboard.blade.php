@@ -173,11 +173,6 @@
                                             @foreach($jadwals as $jadwal)
                                                 <option value="{{ $jadwal->id }}" 
                                                         data-poli-id="{{ $jadwal->dokter->id_poli ?? '' }}"
-                                                        data-poli-nama="{{ $jadwal->dokter->poli->nama_poli ?? 'Poli' }}"
-                                                        data-dokter="Dr. {{ $jadwal->dokter->nama ?? '-' }}"
-                                                        data-hari="{{ $jadwal->hari }}"
-                                                        data-jam="{{ date('H:i', strtotime($jadwal->jam_mulai)) }} - {{ date('H:i', strtotime($jadwal->jam_selesai)) }} WIB"
-                                                        data-antrian="{{ $jadwal->antrian_sekarang ?? 0 }}"
                                                         {{ old('id_jadwal') == $jadwal->id ? 'selected' : '' }}>
                                                     [{{ $jadwal->dokter->poli->nama_poli ?? 'Poli' }}] Dr. {{ $jadwal->dokter->nama ?? '-' }} ({{ $jadwal->hari }}, {{ date('H:i', strtotime($jadwal->jam_mulai)) }}-{{ date('H:i', strtotime($jadwal->jam_selesai)) }})
                                                 </option>
@@ -192,20 +187,6 @@
                                     @enderror
                                 </div>
 
-                                {{-- Kartu Info Jadwal Terpilih --}}
-                                <div id="jadwalPreviewCard" class="hidden p-3 rounded-xl bg-primary/5 border border-primary/15 text-xs space-y-1 transition animate-fadeIn">
-                                    <div class="flex items-center justify-between">
-                                        <span class="font-bold text-primary flex items-center gap-1.5" id="previewPoli">
-                                            <i class="fas fa-hospital text-[11px]"></i> <span>-</span>
-                                        </span>
-                                        <span class="text-[10px] uppercase font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">Dipilih</span>
-                                    </div>
-                                    <div class="font-bold text-base-content text-xs" id="previewDokter">-</div>
-                                    <div class="flex items-center justify-between text-base-content/70 pt-1 border-t border-primary/10 text-[11px]">
-                                        <span id="previewWaktu"><i class="far fa-clock text-primary/70 mr-1"></i> -</span>
-                                        <span>Antrian saat ini: <strong class="text-primary font-mono font-bold" id="previewAntrian">#0</strong></span>
-                                    </div>
-                                </div>
 
                                 {{-- 3. Keluhan --}}
                                 <div class="form-control">
@@ -311,29 +292,10 @@
 
     {{-- ================= 4. REAL-TIME LIVE UPDATE & FORM FILTER SCRIPT ================= --}}
     <script>
-        // Interactive Poli Filter & Schedule Preview Handler
+        // Interactive Poli Filter & Schedule Selection Handler
         document.addEventListener('DOMContentLoaded', function () {
             const filterPoli = document.getElementById('filterPoli');
             const selectJadwal = document.getElementById('selectJadwal');
-            const previewCard = document.getElementById('jadwalPreviewCard');
-            const previewPoli = document.getElementById('previewPoli');
-            const previewDokter = document.getElementById('previewDokter');
-            const previewWaktu = document.getElementById('previewWaktu');
-            const previewAntrian = document.getElementById('previewAntrian');
-
-            function updateJadwalPreview() {
-                if (!selectJadwal || !previewCard) return;
-                const opt = selectJadwal.selectedOptions ? selectJadwal.selectedOptions[0] : null;
-                if (opt && opt.value) {
-                    if (previewPoli) previewPoli.innerHTML = '<i class="fas fa-hospital text-[11px]"></i> <span>' + (opt.dataset.poliNama || 'Poliklinik') + '</span>';
-                    if (previewDokter) previewDokter.innerText = opt.dataset.dokter || '-';
-                    if (previewWaktu) previewWaktu.innerHTML = '<i class="far fa-clock text-primary/70 mr-1"></i> ' + (opt.dataset.hari || '') + ', ' + (opt.dataset.jam || '');
-                    if (previewAntrian) previewAntrian.innerText = '#' + (opt.dataset.antrian || '0');
-                    previewCard.classList.remove('hidden');
-                } else {
-                    previewCard.classList.add('hidden');
-                }
-            }
 
             if (filterPoli && selectJadwal) {
                 filterPoli.addEventListener('change', function () {
@@ -354,7 +316,6 @@
                     if (!hasMatchingSelected && selectJadwal.value) {
                         selectJadwal.value = '';
                     }
-                    updateJadwalPreview();
                 });
 
                 selectJadwal.addEventListener('change', function () {
@@ -362,11 +323,7 @@
                     if (opt && opt.dataset.poliId && filterPoli) {
                         filterPoli.value = opt.dataset.poliId;
                     }
-                    updateJadwalPreview();
                 });
-
-                // Initialize preview on page load if an option was preselected (e.g. via old input)
-                updateJadwalPreview();
             }
         });
 

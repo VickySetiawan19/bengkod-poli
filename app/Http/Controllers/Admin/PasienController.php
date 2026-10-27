@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\ExcelExportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -94,20 +95,16 @@ class PasienController extends Controller
         $pasiens = User::where('role', 'pasien')->get();
 
         $headers = ['No', 'Nama Pasien', 'No. RM', 'Alamat', 'No. KTP', 'No. HP', 'Email'];
-        $rows = [];
-        $no = 1;
-        foreach ($pasiens as $p) {
-            $rows[] = [
-                $no++,
-                $p->nama,
-                $p->no_rm ?? '-',
-                $p->alamat,
-                $p->no_ktp,
-                $p->no_hp,
-                $p->email,
-            ];
-        }
+        $rows = $pasiens->map(fn ($p, $i) => [
+            $i + 1,
+            $p->nama,
+            $p->no_rm ?? '-',
+            $p->alamat,
+            $p->no_ktp,
+            $p->no_hp,
+            $p->email,
+        ])->all();
 
-        return \App\Services\ExcelExportService::download('data_pasien_' . date('Ymd_His'), $headers, $rows);
+        return ExcelExportService::download('data_pasien_' . date('Ymd_His'), $headers, $rows);
     }
 }

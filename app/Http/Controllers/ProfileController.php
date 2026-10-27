@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UpdatePasswordRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -21,11 +20,21 @@ class ProfileController extends Controller
     /**
      * Update the user password with server-side validation.
      */
-    public function updatePassword(UpdatePasswordRequest $request)
+    public function updatePassword(Request $request)
     {
-        $user = Auth::user();
+        $request->validate([
+            'password_lama' => ['required', 'current_password'],
+            'password_baru' => ['required', 'string', 'min:8', 'confirmed', 'different:password_lama'],
+        ], [
+            'password_lama.required' => 'Password lama wajib diisi.',
+            'password_lama.current_password' => 'Password lama tidak cocok dengan password akun saat ini.',
+            'password_baru.required' => 'Password baru wajib diisi.',
+            'password_baru.min' => 'Password baru minimal harus 8 karakter.',
+            'password_baru.confirmed' => 'Konfirmasi password baru tidak cocok.',
+            'password_baru.different' => 'Password baru tidak boleh sama dengan password lama.',
+        ]);
 
-        $user->update([
+        Auth::user()->update([
             'password' => Hash::make($request->password_baru),
         ]);
 

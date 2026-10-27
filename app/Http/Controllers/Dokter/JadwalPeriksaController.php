@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dokter;
 
 use App\Http\Controllers\Controller;
 use App\Models\JadwalPeriksa;
+use App\Services\ExcelExportService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -133,19 +134,15 @@ class JadwalPeriksaController extends Controller
         $jadwals = JadwalPeriksa::where('id_dokter', Auth::id())->get();
 
         $headers = ['No', 'Hari', 'Jam Mulai', 'Jam Selesai', 'Status', 'Nomor Antrian Sedang Dilayani'];
-        $rows = [];
-        $no = 1;
-        foreach ($jadwals as $j) {
-            $rows[] = [
-                $no++,
-                $j->hari,
-                $j->jam_mulai,
-                $j->jam_selesai,
-                strtoupper($j->status ?? 'AKTIF'),
-                $j->antrian_sekarang ?? 0,
-            ];
-        }
+        $rows = $jadwals->map(fn ($j, $i) => [
+            $i + 1,
+            $j->hari,
+            $j->jam_mulai,
+            $j->jam_selesai,
+            strtoupper($j->status ?? 'AKTIF'),
+            $j->antrian_sekarang ?? 0,
+        ])->all();
 
-        return \App\Services\ExcelExportService::download('jadwal_periksa_' . date('Ymd_His'), $headers, $rows);
+        return ExcelExportService::download('jadwal_periksa_' . date('Ymd_His'), $headers, $rows);
     }
 }

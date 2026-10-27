@@ -76,18 +76,13 @@ class RiwayatPasienController extends Controller
             'Status Pembayaran'
         ];
 
-        $rows = [];
-        $no = 1;
-        foreach ($riwayats as $r) {
+        $rows = $riwayats->map(function ($r, $i) {
             $daftarPoli = $r->daftarPoli;
             $pasien = $daftarPoli->pasien ?? null;
+            $obatList = $r->detailPeriksas->map(fn ($dp) => $dp->obat->nama_obat ?? '-')->implode(', ');
 
-            $obatList = $r->detailPeriksas->map(function ($dp) {
-                return $dp->obat->nama_obat ?? '-';
-            })->implode(', ');
-
-            $rows[] = [
-                $no++,
+            return [
+                $i + 1,
                 $pasien->nama ?? '-',
                 $pasien->no_rm ?? '-',
                 $pasien->no_ktp ?? '-',
@@ -98,7 +93,7 @@ class RiwayatPasienController extends Controller
                 $r->biaya_periksa,
                 strtoupper(str_replace('_', ' ', $r->status_pembayaran)),
             ];
-        }
+        })->all();
 
         $filename = 'riwayat_pasien_' . date('Ymd_His');
 
