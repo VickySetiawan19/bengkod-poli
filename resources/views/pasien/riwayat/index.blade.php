@@ -40,7 +40,8 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="badge badge-primary badge-outline font-semibold whitespace-nowrap">
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/80 whitespace-nowrap shadow-2xs">
+                                            <i class="fas fa-hospital text-[10px] text-indigo-500"></i>
                                             {{ $poli->nama_poli ?? 'Poliklinik' }}
                                         </span>
                                     </td>

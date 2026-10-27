@@ -139,8 +139,19 @@
             <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
                 <i class="fas fa-receipt text-primary"></i> Bukti Pembayaran: <span id="modalPasienName"></span>
             </h3>
-            <div class="bg-base-200 rounded-xl overflow-hidden flex items-center justify-center p-2 min-h-[300px]">
-                <img id="modalImage" src="" alt="Bukti Pembayaran" class="max-h-[500px] w-auto object-contain rounded-lg shadow">
+            <div class="bg-base-200/60 rounded-xl overflow-hidden flex flex-col items-center justify-center p-3 min-h-[300px] relative">
+                <div id="adminLoadingSpinner" class="loading loading-spinner loading-md text-primary hidden"></div>
+                <img id="modalImage" 
+                     src="" 
+                     alt="Bukti Pembayaran" 
+                     class="max-h-[500px] w-auto object-contain rounded-lg shadow transition"
+                     onload="document.getElementById('adminLoadingSpinner').classList.add('hidden')"
+                     onerror="this.classList.add('hidden'); document.getElementById('adminErrorMsg').classList.remove('hidden'); document.getElementById('adminLoadingSpinner').classList.add('hidden')">
+                <div id="adminErrorMsg" class="hidden text-center py-8 text-base-content/60">
+                    <i class="fas fa-triangle-exclamation text-3xl text-warning mb-2 block"></i>
+                    <p class="font-semibold text-xs">Gambar bukti tidak dapat dimuat</p>
+                    <p class="text-[11px] text-base-content/50 mt-0.5">Pastikan tautan storage terhubung atau file belum terhapus.</p>
+                </div>
             </div>
             <div class="modal-action">
                 <a id="modalDownloadLink" href="" target="_blank" class="btn btn-primary btn-sm gap-1">
@@ -158,8 +169,18 @@
 
     <script>
         function openPreviewModal(imgUrl, pasienName) {
+            const img = document.getElementById('modalImage');
+            const err = document.getElementById('adminErrorMsg');
+            const spinner = document.getElementById('adminLoadingSpinner');
+
+            if (err) err.classList.add('hidden');
+            if (img) {
+                img.classList.remove('hidden');
+                img.src = imgUrl;
+            }
+            if (spinner) spinner.classList.remove('hidden');
+
             document.getElementById('modalPasienName').innerText = pasienName;
-            document.getElementById('modalImage').src = imgUrl;
             document.getElementById('modalDownloadLink').href = imgUrl;
             document.getElementById('previewModal').showModal();
         }

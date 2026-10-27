@@ -137,35 +137,86 @@
                                 </div>
                             </div>
                         @else
-                            <form action="{{ route('pasien.daftar-poli.store') }}" method="POST" class="space-y-4">
+                            <form action="{{ route('pasien.daftar-poli.store') }}" method="POST" class="space-y-3.5">
                                 @csrf
 
-                                {{-- Pilih Poli & Jadwal Dokter --}}
+                                {{-- 1. Filter Poliklinik --}}
                                 <div class="form-control">
                                     <label class="label pb-1">
-                                        <span class="label-text font-bold text-xs">Pilih Jadwal Dokter <span class="text-error">*</span></span>
+                                        <span class="label-text font-bold text-xs text-base-content/80 flex items-center gap-1.5">
+                                            <i class="fas fa-hospital text-primary text-[11px]"></i> 1. Poliklinik
+                                        </span>
                                     </label>
-                                    <select name="id_jadwal" class="select select-bordered select-sm w-full text-xs @error('id_jadwal') select-error @enderror" required>
-                                        <option value="" disabled selected>-- Pilih Dokter & Hari Praktik --</option>
-                                        @foreach($jadwals as $jadwal)
-                                            <option value="{{ $jadwal->id }}" {{ old('id_jadwal') == $jadwal->id ? 'selected' : '' }}>
-                                                {{ $jadwal->dokter->poli->nama_poli ?? 'Poli' }} — Dr. {{ $jadwal->dokter->nama ?? '-' }} ({{ $jadwal->hari }}, {{ date('H:i', strtotime($jadwal->jam_mulai)) }}-{{ date('H:i', strtotime($jadwal->jam_selesai)) }})
-                                            </option>
-                                        @endforeach
-                                    </select>
+                                    <div class="relative">
+                                        <select id="filterPoli" class="w-full bg-base-100 border border-base-300 rounded-xl px-3.5 py-2.5 pr-10 text-xs font-semibold text-base-content focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none appearance-none transition shadow-2xs cursor-pointer">
+                                            <option value="">-- Semua Poliklinik --</option>
+                                            @foreach($polis as $p)
+                                                <option value="{{ $p->id }}">{{ $p->nama_poli }}</option>
+                                            @endforeach
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-base-content/40">
+                                            <i class="fas fa-chevron-down text-xs"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- 2. Pilih Dokter & Jadwal Praktik --}}
+                                <div class="form-control">
+                                    <label class="label pb-1">
+                                        <span class="label-text font-bold text-xs text-base-content/80 flex items-center gap-1.5">
+                                            <i class="fas fa-user-doctor text-primary text-[11px]"></i> 2. Dokter & Jadwal <span class="text-error">*</span>
+                                        </span>
+                                    </label>
+                                    <div class="relative">
+                                        <select name="id_jadwal" id="selectJadwal" class="w-full bg-base-100 border border-base-300 rounded-xl px-3.5 py-2.5 pr-10 text-xs font-medium text-base-content focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none appearance-none transition shadow-2xs cursor-pointer @error('id_jadwal') border-error @enderror" required>
+                                            <option value="" disabled selected>-- Pilih Dokter & Hari Praktik --</option>
+                                            @foreach($jadwals as $jadwal)
+                                                <option value="{{ $jadwal->id }}" 
+                                                        data-poli-id="{{ $jadwal->dokter->id_poli ?? '' }}"
+                                                        data-poli-nama="{{ $jadwal->dokter->poli->nama_poli ?? 'Poli' }}"
+                                                        data-dokter="Dr. {{ $jadwal->dokter->nama ?? '-' }}"
+                                                        data-hari="{{ $jadwal->hari }}"
+                                                        data-jam="{{ date('H:i', strtotime($jadwal->jam_mulai)) }} - {{ date('H:i', strtotime($jadwal->jam_selesai)) }} WIB"
+                                                        data-antrian="{{ $jadwal->antrian_sekarang ?? 0 }}"
+                                                        {{ old('id_jadwal') == $jadwal->id ? 'selected' : '' }}>
+                                                    [{{ $jadwal->dokter->poli->nama_poli ?? 'Poli' }}] Dr. {{ $jadwal->dokter->nama ?? '-' }} ({{ $jadwal->hari }}, {{ date('H:i', strtotime($jadwal->jam_mulai)) }}-{{ date('H:i', strtotime($jadwal->jam_selesai)) }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-base-content/40">
+                                            <i class="fas fa-chevron-down text-xs"></i>
+                                        </div>
+                                    </div>
                                     @error('id_jadwal')
                                         <label class="label pt-1"><span class="label-text-alt text-error text-xs">{{ $message }}</span></label>
                                     @enderror
                                 </div>
 
-                                {{-- Keluhan --}}
+                                {{-- Kartu Info Jadwal Terpilih --}}
+                                <div id="jadwalPreviewCard" class="hidden p-3 rounded-xl bg-primary/5 border border-primary/15 text-xs space-y-1 transition animate-fadeIn">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-bold text-primary flex items-center gap-1.5" id="previewPoli">
+                                            <i class="fas fa-hospital text-[11px]"></i> <span>-</span>
+                                        </span>
+                                        <span class="text-[10px] uppercase font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">Dipilih</span>
+                                    </div>
+                                    <div class="font-bold text-base-content text-xs" id="previewDokter">-</div>
+                                    <div class="flex items-center justify-between text-base-content/70 pt-1 border-t border-primary/10 text-[11px]">
+                                        <span id="previewWaktu"><i class="far fa-clock text-primary/70 mr-1"></i> -</span>
+                                        <span>Antrian saat ini: <strong class="text-primary font-mono font-bold" id="previewAntrian">#0</strong></span>
+                                    </div>
+                                </div>
+
+                                {{-- 3. Keluhan --}}
                                 <div class="form-control">
                                     <label class="label pb-1">
-                                        <span class="label-text font-bold text-xs">Keluhan Gejala Medis <span class="text-error">*</span></span>
+                                        <span class="label-text font-bold text-xs text-base-content/80 flex items-center gap-1.5">
+                                            <i class="fas fa-notes-medical text-primary text-[11px]"></i> 3. Keluhan Gejala Medis <span class="text-error">*</span>
+                                        </span>
                                     </label>
                                     <textarea name="keluhan" 
-                                              rows="4" 
-                                              class="textarea textarea-bordered textarea-sm w-full text-xs leading-relaxed @error('keluhan') textarea-error @enderror" 
+                                              rows="3" 
+                                              class="textarea textarea-bordered w-full rounded-xl text-xs leading-relaxed @error('keluhan') textarea-error @enderror" 
                                               placeholder="Jelaskan secara singkat gejala atau keluhan kesehatan yang Anda alami..." 
                                               required>{{ old('keluhan') }}</textarea>
                                     @error('keluhan')
@@ -173,7 +224,7 @@
                                     @enderror
                                 </div>
 
-                                <button type="submit" class="btn btn-primary btn-sm w-full gap-2 shadow-sm">
+                                <button type="submit" class="btn btn-primary btn-sm w-full gap-2 rounded-xl font-bold shadow-sm">
                                     <i class="fas fa-paper-plane"></i> Ambil Nomor Antrian
                                 </button>
                             </form>
@@ -206,7 +257,7 @@
                                 <thead class="bg-base-200/60 text-xs uppercase tracking-wider text-base-content/70">
                                     <tr>
                                         <th class="px-5 py-3.5">No</th>
-                                        <th class="px-5 py-3.5">Poli</th>
+                                        <th class="px-5 py-3.5 whitespace-nowrap">Poli</th>
                                         <th class="px-5 py-3.5">Dokter</th>
                                         <th class="px-5 py-3.5">Hari</th>
                                         <th class="px-5 py-3.5">Jam Periksa</th>
@@ -219,8 +270,9 @@
                                             <td class="px-5 py-3.5 font-semibold text-base-content/60 text-xs">
                                                 {{ $index + 1 }}
                                             </td>
-                                            <td class="px-5 py-3.5">
-                                                <span class="badge badge-primary badge-outline badge-sm font-semibold">
+                                            <td class="px-5 py-3.5 whitespace-nowrap">
+                                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/80 whitespace-nowrap shadow-2xs">
+                                                    <i class="fas fa-hospital text-[10px] text-indigo-500"></i>
                                                     {{ $jadwal->dokter->poli->nama_poli ?? 'Poliklinik' }}
                                                 </span>
                                             </td>
@@ -257,8 +309,67 @@
         </div>
     </div>
 
-    {{-- ================= 4. REAL-TIME LIVE UPDATE SCRIPT ================= --}}
+    {{-- ================= 4. REAL-TIME LIVE UPDATE & FORM FILTER SCRIPT ================= --}}
     <script>
+        // Interactive Poli Filter & Schedule Preview Handler
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterPoli = document.getElementById('filterPoli');
+            const selectJadwal = document.getElementById('selectJadwal');
+            const previewCard = document.getElementById('jadwalPreviewCard');
+            const previewPoli = document.getElementById('previewPoli');
+            const previewDokter = document.getElementById('previewDokter');
+            const previewWaktu = document.getElementById('previewWaktu');
+            const previewAntrian = document.getElementById('previewAntrian');
+
+            function updateJadwalPreview() {
+                if (!selectJadwal || !previewCard) return;
+                const opt = selectJadwal.selectedOptions ? selectJadwal.selectedOptions[0] : null;
+                if (opt && opt.value) {
+                    if (previewPoli) previewPoli.innerHTML = '<i class="fas fa-hospital text-[11px]"></i> <span>' + (opt.dataset.poliNama || 'Poliklinik') + '</span>';
+                    if (previewDokter) previewDokter.innerText = opt.dataset.dokter || '-';
+                    if (previewWaktu) previewWaktu.innerHTML = '<i class="far fa-clock text-primary/70 mr-1"></i> ' + (opt.dataset.hari || '') + ', ' + (opt.dataset.jam || '');
+                    if (previewAntrian) previewAntrian.innerText = '#' + (opt.dataset.antrian || '0');
+                    previewCard.classList.remove('hidden');
+                } else {
+                    previewCard.classList.add('hidden');
+                }
+            }
+
+            if (filterPoli && selectJadwal) {
+                filterPoli.addEventListener('change', function () {
+                    const selectedPoliId = this.value;
+                    let hasMatchingSelected = false;
+
+                    Array.from(selectJadwal.options).forEach(opt => {
+                        if (!opt.value) return; // skip placeholder
+                        const match = !selectedPoliId || opt.dataset.poliId === selectedPoliId;
+                        opt.hidden = !match;
+                        opt.disabled = !match;
+                        if (match && opt.selected) {
+                            hasMatchingSelected = true;
+                        }
+                    });
+
+                    // If currently selected option is now hidden, reset to placeholder
+                    if (!hasMatchingSelected && selectJadwal.value) {
+                        selectJadwal.value = '';
+                    }
+                    updateJadwalPreview();
+                });
+
+                selectJadwal.addEventListener('change', function () {
+                    const opt = this.selectedOptions ? this.selectedOptions[0] : null;
+                    if (opt && opt.dataset.poliId && filterPoli) {
+                        filterPoli.value = opt.dataset.poliId;
+                    }
+                    updateJadwalPreview();
+                });
+
+                // Initialize preview on page load if an option was preselected (e.g. via old input)
+                updateJadwalPreview();
+            }
+        });
+
         // Real-time synchronization polling every 3 seconds to guarantee updates without reloading page
         function fetchLiveAntrian() {
             fetch("{{ route('api.antrian.status') }}")

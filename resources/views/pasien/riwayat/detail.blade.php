@@ -26,7 +26,10 @@
             <div class="card-body p-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-base-200 gap-2">
                     <div>
-                        <span class="badge badge-primary badge-outline badge-sm font-semibold">{{ $poli->nama_poli ?? 'Poliklinik' }}</span>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200/80 whitespace-nowrap shadow-2xs">
+                            <i class="fas fa-hospital text-[10px] text-indigo-500"></i>
+                            {{ $poli->nama_poli ?? 'Poliklinik' }}
+                        </span>
                         <h2 class="text-xl font-bold text-base-content mt-1">Dr. {{ $dokter->nama ?? '-' }}</h2>
                     </div>
                     <div class="text-left sm:text-right">
