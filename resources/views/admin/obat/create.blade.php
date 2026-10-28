@@ -111,13 +111,13 @@
                 {{-- Buttons --}}
                 <div class="flex gap-3">
                     <button type="submit"
-                        class="flex items-center gap-2 px-6 py-2.5 bg-[#2d4499] hover:bg-[#1e2d6b] text-white rounded-lg text-sm font-semibold transition">
+                        class="btn btn-primary rounded-xl text-sm font-semibold shadow-sm">
                         <i class="fas fa-save"></i>
                         Simpan
                     </button>
 
                     <a href="{{ route('obat.index') }}"
-                        class="flex items-center gap-2 px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-lg text-sm font-semibold transition">
+                        class="btn btn-ghost rounded-xl text-sm font-semibold">
                         Batal
                     </a>
                 </div>

@@ -3,7 +3,7 @@
     {{-- ================= BRAND ================= --}}
     <div class="px-5 py-5 border-b border-white/10">
         <div class="flex items-center gap-3">
-            <img src="{{ asset('images/logo-bengkot.png') }}" class="w-10 h-10 rounded-xl object-cover shadow">
+            <img src="{{ asset('images/logo-bengkot.png') }}" alt="Logo Poliklinik" class="w-10 h-10 rounded-xl object-cover shadow">
 
             <div>
                 <div class="font-bold text-white text-lg leading-tight">

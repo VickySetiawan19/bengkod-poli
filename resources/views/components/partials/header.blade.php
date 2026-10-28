@@ -1,15 +1,15 @@
 <header class="bg-base-100 border-b border-base-300 h-16 flex items-center px-6 gap-4 sticky top-0 z-30 shadow-sm">
 
     {{-- Mobile Hamburger --}}
-    <button onclick="toggleSidebar()" class="btn btn-square btn-ghost lg:hidden">
-        <i data-lucide="menu" class="w-5 h-5"></i>
+    <button onclick="toggleSidebar()" class="btn btn-square btn-ghost lg:hidden" aria-label="Buka navigasi sidebar">
+        <i class="fas fa-bars text-lg"></i>
     </button>
 
     {{-- Breadcrumb --}}
     <div class="flex-1">
         <div class="flex items-center gap-2 text-sm">
             <span class="text-base-content/50">Poliklinik</span>
-            <i data-lucide="chevron-right" class="w-4 h-4 text-base-content/30"></i>
+            <i class="fas fa-chevron-right text-xs text-base-content/30"></i>
             <span class="font-semibold text-base-content">
                 {{ $title ?? 'Dashboard' }}
             </span>
@@ -17,7 +17,7 @@
     </div>
 
     {{-- Fullscreen --}}
-    <button onclick="toggleFullscreen()" class="btn btn-square btn-ghost">
+    <button onclick="toggleFullscreen()" class="btn btn-square btn-ghost" aria-label="Beralih layar penuh">
         <i id="fsIcon" class="fas fa-expand w-5 h-5"></i>
     </button>
 
@@ -110,19 +110,3 @@
     </div>
 
 </header>
-
-<script>
-    function toggleFullscreen() {
-    const icon = document.getElementById('fsIcon');
-
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-        icon.classList.remove('fa-expand');
-        icon.classList.add('fa-compress');
-    } else {
-        document.exitFullscreen();
-        icon.classList.remove('fa-compress');
-        icon.classList.add('fa-expand');
-    }
-}
-</script>

@@ -22,14 +22,14 @@
     </div>
 
     {{-- Card --}}
-    <div class="card bg-base-100 shadow-md rounded-2 border">
+    <div class="card bg-base-100 shadow-sm rounded-2xl border border-base-200 overflow-hidden">
         <div class="card-body p-0">
 
             <div class="overflow-x-auto">
                 <table class="table w-full">
 
                     {{-- Table Head --}}
-                    <thead class="bg-slate-50 text-slate-500 uppercase text-xs tracking-wider">
+                    <thead class="bg-base-200/60 text-xs uppercase tracking-wider text-base-content/70">
                         <tr>
                             <th class="px-6 py-4">Nama Pasien</th>
                             <th class="px-6 py-4">No. RM</th>

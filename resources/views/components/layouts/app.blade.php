@@ -34,14 +34,14 @@
             <div class="main-scroll">
 
                 @if(session('success'))
-                <div class="alert alert-success mb-4 rounded-xl shadow-sm">
+                <div role="alert" aria-live="polite" class="alert alert-success mb-4 rounded-xl shadow-sm">
                     <i class="fas fa-check-circle"></i>
                     <span>{{ session('success') }}</span>
                 </div>
                 @endif
 
                 @if(session('error'))
-                <div class="alert alert-error mb-4 rounded-xl shadow-sm">
+                <div role="alert" aria-live="assertive" class="alert alert-error mb-4 rounded-xl shadow-sm">
                     <i class="fas fa-circle-xmark"></i>
                     <span>{{ session('error') }}</span>
                 </div>
@@ -82,6 +82,17 @@
                 icon.className='fas fa-expand'
             }
         }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const sidebar = document.getElementById('appSidebar');
+                const overlay = document.getElementById('sidebarOverlay');
+                if (sidebar && sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                    if (overlay) overlay.style.display = 'none';
+                }
+            }
+        });
     </script>
 
     @stack('scripts')

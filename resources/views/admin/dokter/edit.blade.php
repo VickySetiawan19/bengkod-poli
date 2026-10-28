@@ -2,9 +2,7 @@
 
     {{-- Header --}}
     <div class="flex items-center gap-3 mb-6">
-        <a href="{{ route('dokter.index') }}" class="flex items-center justify-center w-9 h-9 rounded-lg 
-                  bg-slate-100 hover:bg-slate-200 
-                  text-slate-600 transition">
+        <a href="{{ route('dokter.index') }}" class="btn btn-ghost btn-square btn-sm rounded-xl" aria-label="Kembali ke Data Dokter">
             <i class="fas fa-arrow-left text-sm"></i>
         </a>
 
@@ -14,8 +12,8 @@
     </div>
 
     {{-- Card --}}
-    <div class="card bg-base-100 shadow-md rounded-2xl border border-slate-200">
-        <div class="card-body p-8">
+    <div class="card bg-base-100 shadow-sm rounded-2xl border border-base-200">
+        <div class="card-body p-6 sm:p-8">
 
             <form action="{{ route('dokter.update', $dokter->id) }}" method="POST">
                 @csrf
@@ -24,122 +22,117 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
 
                     {{-- Nama --}}
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">
-                            Nama Dokter <span class="text-red-500">*</span>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold text-slate-700 text-sm">
+                                Nama Dokter <span class="text-error">*</span>
+                            </span>
                         </label>
                         <input type="text" name="nama" value="{{ old('nama', $dokter->nama) }}"
-                            placeholder="Masukkan nama dokter..." class="w-full px-4 py-2 rounded-lg 
-                                      border-2 focus:border-primary focus:outline-none
-                                      @error('nama') border-red-500 @enderror" required>
+                            placeholder="Masukkan nama dokter..." class="input input-bordered w-full rounded-xl @error('nama') input-error @enderror" required>
                         @error('nama')
-                        <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                        <span class="text-xs text-error mt-1">{{ $message }}</span>
                         @enderror
                     </div>
 
                     {{-- Email --}}
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">
-                            Email <span class="text-red-500">*</span>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold text-slate-700 text-sm">
+                                Email <span class="text-error">*</span>
+                            </span>
                         </label>
                         <input type="email" name="email" value="{{ old('email', $dokter->email) }}"
-                            placeholder="Masukkan email..." class="w-full px-4 py-2 rounded-lg 
-                                      border-2 focus:border-primary focus:outline-none
-                                      @error('email') border-red-500 @enderror" required>
+                            placeholder="Masukkan email..." class="input input-bordered w-full rounded-xl @error('email') input-error @enderror" required>
                         @error('email')
-                        <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                        <span class="text-xs text-error mt-1">{{ $message }}</span>
                         @enderror
                     </div>
 
                     {{-- No KTP --}}
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">
-                            No. KTP <span class="text-red-500">*</span>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold text-slate-700 text-sm">
+                                No. KTP <span class="text-error">*</span>
+                            </span>
                         </label>
-                        <input type="number" name="no_ktp" value="{{ old('no_ktp', $dokter->no_ktp) }}"
-                            placeholder="Masukkan No. KTP..." class="w-full px-4 py-2 rounded-lg 
-                                      border-2 focus:border-primary focus:outline-none
-                                      @error('no_ktp') border-red-500 @enderror" required>
+                        <input type="text" inputmode="numeric" pattern="[0-9]{16}" maxlength="16" name="no_ktp" value="{{ old('no_ktp', $dokter->no_ktp) }}"
+                            placeholder="16 digit NIK..." class="input input-bordered w-full rounded-xl @error('no_ktp') input-error @enderror" required>
                         @error('no_ktp')
-                        <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                        <span class="text-xs text-error mt-1">{{ $message }}</span>
                         @enderror
                     </div>
 
                     {{-- No HP --}}
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">
-                            No. HP <span class="text-red-500">*</span>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold text-slate-700 text-sm">
+                                No. HP <span class="text-error">*</span>
+                            </span>
                         </label>
-                        <input type="number" name="no_hp" value="{{ old('no_hp', $dokter->no_hp) }}"
-                            placeholder="Masukkan No. HP..." class="w-full px-4 py-2 rounded-lg 
-                                      border-2 focus:border-primary focus:outline-none
-                                      @error('no_hp') border-red-500 @enderror" required>
+                        <input type="tel" name="no_hp" value="{{ old('no_hp', $dokter->no_hp) }}"
+                            placeholder="Contoh: 081234567890" class="input input-bordered w-full rounded-xl @error('no_hp') input-error @enderror" required>
                         @error('no_hp')
-                        <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                        <span class="text-xs text-error mt-1">{{ $message }}</span>
                         @enderror
                     </div>
 
                 </div>
 
                 {{-- Alamat --}}
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">
-                        Alamat <span class="text-red-500">*</span>
+                <div class="form-control mb-6">
+                    <label class="label">
+                        <span class="label-text font-semibold text-slate-700 text-sm">
+                            Alamat <span class="text-error">*</span>
+                        </span>
                     </label>
-                    <textarea name="alamat" rows="3" placeholder="Masukkan alamat..." class="w-full px-4 py-2 rounded-lg 
-                                     border-2 focus:border-primary focus:outline-none
-                                     @error('alamat') border-red-500 @enderror"
+                    <textarea name="alamat" rows="3" placeholder="Masukkan alamat..." class="textarea textarea-bordered w-full rounded-xl @error('alamat') textarea-error @enderror"
                         required>{{ old('alamat', $dokter->alamat) }}</textarea>
                     @error('alamat')
-                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                    <span class="text-xs text-error mt-1">{{ $message }}</span>
                     @enderror
                 </div>
 
                 {{-- Poli --}}
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">
-                        Poli <span class="text-red-500">*</span>
+                <div class="form-control mb-6">
+                    <label class="label">
+                        <span class="label-text font-semibold text-slate-700 text-sm">
+                            Poli <span class="text-error">*</span>
+                        </span>
                     </label>
-                    <select name="id_poli" class="w-full px-4 py-2 rounded-lg 
-                                   border-2 focus:border-primary focus:outline-none
-                                   @error('id_poli') border-red-500 @enderror" required>
+                    <select name="id_poli" class="select select-bordered w-full rounded-xl @error('id_poli') select-error @enderror" required>
                         <option value="">Pilih Poli</option>
                         @foreach($polis as $poli)
-                        <option value="{{ $poli->id }}" {{ (string) old('id_poli', $dokter->id_poli) === (string)
-                            $poli->id ? 'selected' : '' }}>
+                        <option value="{{ $poli->id }}" {{ (string) old('id_poli', $dokter->id_poli) === (string) $poli->id ? 'selected' : '' }}>
                             {{ $poli->nama_poli }}
                         </option>
                         @endforeach
                     </select>
                     @error('id_poli')
-                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                    <span class="text-xs text-error mt-1">{{ $message }}</span>
                     @enderror
                 </div>
 
                 {{-- Password --}}
-                <div class="mb-8">
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">
-                        Password
+                <div class="form-control mb-8">
+                    <label class="label">
+                        <span class="label-text font-semibold text-slate-700 text-sm">
+                            Password (Opsional)
+                        </span>
                     </label>
-                    <input type="password" name="password" placeholder="Kosongkan jika tidak ingin mengubah..." class="w-full px-4 py-2 rounded-lg 
-                                  border-2 focus:border-primary focus:outline-none
-                                  @error('password') border-red-500 @enderror">
+                    <input type="password" name="password" placeholder="Kosongkan jika tidak ingin mengubah..." class="input input-bordered w-full rounded-xl @error('password') input-error @enderror">
                     @error('password')
-                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                    <span class="text-xs text-error mt-1">{{ $message }}</span>
                     @enderror
                 </div>
 
                 {{-- Buttons --}}
-                <div class="flex gap-3">
-                    <button type="submit" class="px-6 py-2.5 rounded-lg bg-primary 
-                               hover:bg-primary/90 text-white 
-                               font-semibold text-sm transition">
+                <div class="flex items-center gap-3">
+                    <button type="submit" class="btn btn-primary rounded-xl px-6 shadow-sm">
                         <i class="fas fa-save mr-1"></i> Update
                     </button>
 
-                    <a href="{{ route('dokter.index') }}" class="px-6 py-2.5 rounded-lg bg-slate-100 
-                              hover:bg-slate-200 text-slate-600 
-                              font-semibold text-sm transition">
+                    <a href="{{ route('dokter.index') }}" class="btn btn-ghost rounded-xl px-6">
                         Batal
                     </a>
                 </div>

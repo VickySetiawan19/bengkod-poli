@@ -44,7 +44,19 @@ Route::middleware('auth')->group(function () {
 // Role Admin
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
-        return view('admin.dashboard');
+        $totalDokter = \App\Models\User::where('role', 'dokter')->count();
+        $totalPasien = \App\Models\User::where('role', 'pasien')->count();
+        $totalPoli = \App\Models\Poli::count();
+        $totalObat = \App\Models\Obat::count();
+        $menungguVerifikasiCount = \App\Models\Periksa::where('status_pembayaran', 'menunggu_verifikasi')->count();
+        $totalPendapatan = \App\Models\Periksa::where('status_pembayaran', 'lunas')->sum('biaya_periksa');
+        $recentPendaftarans = \App\Models\DaftarPoli::with(['pasien', 'jadwalPeriksa.dokter.poli'])->latest()->take(5)->get();
+        $recentVerifikasi = \App\Models\Periksa::with(['daftarPoli.pasien', 'daftarPoli.jadwalPeriksa.dokter.poli'])->where('status_pembayaran', 'menunggu_verifikasi')->latest()->take(5)->get();
+
+        return view('admin.dashboard', compact(
+            'totalDokter', 'totalPasien', 'totalPoli', 'totalObat',
+            'menungguVerifikasiCount', 'totalPendapatan', 'recentPendaftarans', 'recentVerifikasi'
+        ));
     })->name('admin.dashboard');
 
     // Exports (Defined before resource routes to avoid route collisions)
@@ -65,7 +77,32 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 // Role Dokter
 Route::middleware(['auth', 'role:dokter'])->prefix('dokter')->group(function () {
     Route::get('/dashboard', function () {
-        return view('dokter.dashboard');
+        $dokterId = auth()->id();
+        $myJadwals = \App\Models\JadwalPeriksa::where('id_dokter', $dokterId)->get();
+        $jadwalIds = $myJadwals->pluck('id');
+
+        $totalAntrianHariIni = \App\Models\DaftarPoli::whereIn('id_jadwal', $jadwalIds)
+            ->whereDate('created_at', today())
+            ->count();
+        $totalPasienDiperiksa = \App\Models\Periksa::whereHas('daftarPoli', fn($q) => $q->whereIn('id_jadwal', $jadwalIds))->count();
+        $activeJadwal = $myJadwals->where('status', 'aktif')->first();
+
+        $antrianAktifList = \App\Models\DaftarPoli::with('pasien')
+            ->whereIn('id_jadwal', $jadwalIds)
+            ->where('status_periksa', '!=', 'selesai')
+            ->orderBy('no_antrian')
+            ->take(5)
+            ->get();
+
+        $recentSelesai = \App\Models\Periksa::with(['daftarPoli.pasien'])
+            ->whereHas('daftarPoli', fn($q) => $q->whereIn('id_jadwal', $jadwalIds))
+            ->latest('id')
+            ->take(5)
+            ->get();
+
+        return view('dokter.dashboard', compact(
+            'myJadwals', 'totalAntrianHariIni', 'totalPasienDiperiksa', 'activeJadwal', 'antrianAktifList', 'recentSelesai'
+        ));
     })->name('dokter.dashboard');
 
     // Jadwal Periksa Export & Resource

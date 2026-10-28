@@ -5,7 +5,7 @@
 
             {{-- Logo & Title --}}
             <div class="text-center mb-8">
-                <img src="{{ asset('images/logo-bengkot.png') }}"
+                <img src="{{ asset('images/logo-bengkot.png') }}" alt="Logo Poliklinik"
                     class="w-[60px] h-[60px] rounded-[16px] object-cover mx-auto mb-[14px] block">
 
                 <h1 class="text-[1.5rem] font-extrabold text-[#1e2d6b] m-0 mb-[6px]">
@@ -20,7 +20,7 @@
 
             {{-- Error Alert --}}
             @if ($errors->any())
-            <div class="alert alert-error mb-5 rounded-xl text-[0.83rem]">
+            <div role="alert" class="alert alert-error mb-5 rounded-xl text-[0.83rem]">
                 <i class="fas fa-circle-xmark"></i>
                 <span>{{ $errors->first() }}</span>
             </div>
@@ -44,7 +44,7 @@
                         <i class="fas fa-envelope text-slate-400 text-[0.82rem]"></i>
 
                         <input type="email" name="email" value="{{ old('email') }}" placeholder="Masukkan email..."
-                            class="grow bg-transparent text-slate-800 text-[0.88rem]" required>
+                            autocomplete="email" class="grow bg-transparent text-slate-800 text-[0.88rem]" required>
                     </label>
 
                 </div>
@@ -63,10 +63,12 @@
                         <i class="fas fa-lock text-slate-400 text-[0.82rem]"></i>
 
                         <input type="password" name="password" id="password_login" placeholder="Masukkan password..."
-                            class="grow bg-transparent text-slate-800 text-[0.88rem]" required>
+                            autocomplete="current-password" class="grow bg-transparent text-slate-800 text-[0.88rem]" required>
 
-                        <i class="fas fa-eye text-slate-400 text-[0.82rem] cursor-pointer" id="toggle_login"
-                            onclick="togglePassword('password_login', 'toggle_login')"></i>
+                        <button type="button" aria-label="Tampilkan atau sembunyikan kata sandi" class="focus:outline-hidden text-slate-400 hover:text-slate-600 transition"
+                            onclick="togglePassword('password_login', 'toggle_login')">
+                            <i class="fas fa-eye text-[0.82rem]" id="toggle_login"></i>
+                        </button>
 
                     </label>
 

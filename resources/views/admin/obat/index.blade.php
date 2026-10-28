@@ -7,11 +7,11 @@
         </h2>
 
         <div class="flex items-center gap-2">
-            <a href="{{ route('obat.export') }}" class="btn bg-emerald-600 hover:bg-emerald-700 text-white border-none rounded-lg px-4 gap-2 shadow-sm">
+            <a href="{{ route('obat.export') }}" class="btn bg-emerald-600 hover:bg-emerald-700 text-white border-none rounded-xl px-4 gap-2 shadow-sm">
                 <i class="fas fa-file-excel"></i>
                 Export Excel
             </a>
-            <a href="{{ route('obat.create') }}" class="btn bg-[#2d4499] hover:bg-[#1e2d6b] text-white border-none rounded-lg px-5 gap-2 shadow-sm">
+            <a href="{{ route('obat.create') }}" class="btn btn-primary rounded-xl px-5 gap-2 shadow-sm">
                 <i class="fas fa-plus"></i>
                 Tambah Obat
             </a>
@@ -19,14 +19,14 @@
     </div>
 
     {{-- Card Table --}}
-    <div class="card bg-base-100 shadow-md rounded-2 border">
+    <div class="card bg-base-100 shadow-sm rounded-2xl border border-base-200 overflow-hidden">
         <div class="card-body p-0">
 
             <div class="overflow-x-auto">
                 <table class="table table-zebra w-full">
 
                     {{-- Head --}}
-                    <thead class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wider">
+                    <thead class="bg-base-200/60 text-xs uppercase tracking-wider text-base-content/70">
                         <tr>
                             <th class="px-6 py-4">Nama Obat</th>
                             <th class="px-6 py-4">Kemasan</th>

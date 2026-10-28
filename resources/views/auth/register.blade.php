@@ -5,7 +5,7 @@
 
             {{-- Logo & Title --}}
             <div class="text-center mb-7">
-                <img src="{{ asset('images/logo-bengkot.png') }}"
+                <img src="{{ asset('images/logo-bengkot.png') }}" alt="Logo Poliklinik"
                      class="w-[60px] h-[60px] rounded-[16px] object-cover mx-auto mb-[14px] block">
                 <h1 class="text-[1.5rem] font-extrabold text-[#1e2d6b] m-0 mb-[6px]">Poliklinik</h1>
                 <p class="text-[0.83rem] text-slate-400 m-0">Buat akun baru</p>
@@ -13,7 +13,7 @@
 
             {{-- Error Alert --}}
             @if ($errors->any())
-                <div class="alert alert-error mb-4 rounded-xl text-[0.83rem]">
+                <div role="alert" class="alert alert-error mb-4 rounded-xl text-[0.83rem]">
                     <i class="fas fa-circle-xmark"></i>
                     <span>{{ $errors->first() }}</span>
                 </div>
@@ -31,6 +31,7 @@
                         <i class="fas fa-user text-slate-400 text-[0.82rem]"></i>
                         <input type="text" name="nama" value="{{ old('nama') }}"
                                placeholder="Masukkan nama lengkap..."
+                               autocomplete="name"
                                class="grow bg-transparent text-slate-800 text-[0.88rem]"
                                required>
                     </label>
@@ -45,6 +46,7 @@
                         <i class="fas fa-envelope text-slate-400 text-[0.82rem]"></i>
                         <input type="email" name="email" value="{{ old('email') }}"
                                placeholder="Masukkan email..."
+                               autocomplete="email"
                                class="grow bg-transparent text-slate-800 text-[0.88rem]"
                                required>
                     </label>
@@ -59,6 +61,7 @@
                         <i class="fas fa-map-marker-alt text-slate-400 text-[0.82rem]"></i>
                         <input type="text" name="alamat" value="{{ old('alamat') }}"
                                placeholder="Masukkan alamat..."
+                               autocomplete="street-address"
                                class="grow bg-transparent text-slate-800 text-[0.88rem]"
                                required>
                     </label>
@@ -72,8 +75,9 @@
                         </label>
                         <label class="input input-bordered flex items-center gap-2 rounded-[10px] border-slate-200 bg-slate-50">
                             <i class="fas fa-phone text-slate-400 text-[0.78rem]"></i>
-                            <input type="number" name="no_hp" value="{{ old('no_hp') }}"
-                                   placeholder="No. HP..."
+                            <input type="tel" name="no_hp" value="{{ old('no_hp') }}"
+                                   placeholder="Contoh: 081234567890"
+                                   autocomplete="tel"
                                    class="grow bg-transparent text-slate-800 text-[0.85rem]"
                                    required>
                         </label>
@@ -84,8 +88,8 @@
                         </label>
                         <label class="input input-bordered flex items-center gap-2 rounded-[10px] border-slate-200 bg-slate-50">
                             <i class="fas fa-address-card text-slate-400 text-[0.78rem]"></i>
-                            <input type="number" name="no_ktp" value="{{ old('no_ktp') }}"
-                                   placeholder="No. KTP..."
+                            <input type="text" inputmode="numeric" pattern="[0-9]{16}" maxlength="16" name="no_ktp" value="{{ old('no_ktp') }}"
+                                   placeholder="16 digit NIK..."
                                    class="grow bg-transparent text-slate-800 text-[0.85rem]"
                                    required>
                         </label>
@@ -101,10 +105,13 @@
                         <i class="fas fa-lock text-slate-400 text-[0.78rem]"></i>
                         <input type="password" name="password" id="password_reg"
                                placeholder="Password..."
+                               autocomplete="new-password"
                                class="grow bg-transparent text-slate-800 text-[0.85rem]"
                                required>
-                        <i class="fas fa-eye text-slate-400 text-[0.78rem] cursor-pointer" id="toggle_reg"
-                           onclick="togglePassword('password_reg', 'toggle_reg')"></i>
+                        <button type="button" aria-label="Tampilkan atau sembunyikan kata sandi" class="focus:outline-hidden text-slate-400 hover:text-slate-600 transition"
+                            onclick="togglePassword('password_reg', 'toggle_reg')">
+                            <i class="fas fa-eye text-[0.78rem]" id="toggle_reg"></i>
+                        </button>
                     </label>
                 </div>
 
@@ -117,10 +124,13 @@
                         <i class="fas fa-lock text-slate-400 text-[0.78rem]"></i>
                         <input type="password" name="password_confirmation" id="password_confirm"
                                placeholder="Ulangi password..."
+                               autocomplete="new-password"
                                class="grow bg-transparent text-slate-800 text-[0.85rem]"
                                required>
-                        <i class="fas fa-eye text-slate-400 text-[0.78rem] cursor-pointer" id="toggle_confirm"
-                           onclick="togglePassword('password_confirm', 'toggle_confirm')"></i>
+                        <button type="button" aria-label="Tampilkan atau sembunyikan konfirmasi kata sandi" class="focus:outline-hidden text-slate-400 hover:text-slate-600 transition"
+                            onclick="togglePassword('password_confirm', 'toggle_confirm')">
+                            <i class="fas fa-eye text-[0.78rem]" id="toggle_confirm"></i>
+                        </button>
                     </label>
                 </div>
 
