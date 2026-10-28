@@ -327,44 +327,62 @@
             }
         });
 
-        // Real-time synchronization polling every 3 seconds to guarantee updates without reloading page
+        // Unified handler for updating queue number badge & banner
+        function handleAntrianUpdate(jadwalId, antrianSekarang) {
+            const badge = document.getElementById('antrian-sekarang-' + jadwalId);
+            if (badge) {
+                const newText = '#' + antrianSekarang;
+                if (badge.innerText !== newText) {
+                    badge.innerText = newText;
+                    badge.classList.add('scale-125', 'bg-warning', 'text-warning-content');
+                    setTimeout(() => {
+                        badge.classList.remove('scale-125', 'bg-warning', 'text-warning-content');
+                    }, 800);
+                }
+            }
+
+            // Update banner active queue currently served if banner exists
+            const activeSedangDilayani = document.getElementById('activeSedangDilayani');
+            const userJadwalId = '{{ $activePendaftaran->id_jadwal ?? "" }}';
+            if (activeSedangDilayani && userJadwalId == jadwalId) {
+                const newActiveServed = '#' + antrianSekarang;
+                if (activeSedangDilayani.innerText !== newActiveServed) {
+                    activeSedangDilayani.innerText = newActiveServed;
+                    activeSedangDilayani.classList.add('scale-110');
+                    setTimeout(() => activeSedangDilayani.classList.remove('scale-110'), 600);
+                }
+            }
+        }
+
+        // 1. Real-Time WebSocket Listener via Laravel Reverb & Echo
+        document.addEventListener('DOMContentLoaded', function () {
+            if (window.Echo) {
+                window.Echo.channel('antrian-channel')
+                    .listen('.AntrianUpdated', function (data) {
+                        console.log('[Reverb Echo] Real-time queue event received:', data);
+                        if (data && data.jadwal_id !== undefined && data.antrian_sekarang !== undefined) {
+                            handleAntrianUpdate(data.jadwal_id, data.antrian_sekarang);
+                        }
+                    });
+            }
+        });
+
+        // 2. HTTP Polling Backup (guarantees sync if WebSocket server is offline or reconnecting)
         function fetchLiveAntrian() {
             fetch("{{ route('api.antrian.status') }}")
                 .then(response => response.json())
                 .then(data => {
                     if (data.success && data.jadwals) {
                         data.jadwals.forEach(j => {
-                            const badge = document.getElementById('antrian-sekarang-' + j.id);
-                            if (badge) {
-                                const newText = '#' + j.antrian_sekarang;
-                                if (badge.innerText !== newText) {
-                                    badge.innerText = newText;
-                                    badge.classList.add('scale-125', 'bg-warning', 'text-warning-content');
-                                    setTimeout(() => {
-                                        badge.classList.remove('scale-125', 'bg-warning', 'text-warning-content');
-                                    }, 800);
-                                }
-                            }
+                            handleAntrianUpdate(j.id, j.antrian_sekarang);
                         });
-
-                        // Update banner active queue currently served if banner exists
-                        const activeSedangDilayani = document.getElementById('activeSedangDilayani');
-                        if (activeSedangDilayani && data.user_active_queue) {
-                            const newActiveServed = '#' + data.user_active_queue.antrian_sekarang;
-                            if (activeSedangDilayani.innerText !== newActiveServed) {
-                                activeSedangDilayani.innerText = newActiveServed;
-                                activeSedangDilayani.classList.add('scale-110');
-                                setTimeout(() => activeSedangDilayani.classList.remove('scale-110'), 600);
-                            }
-                        }
                     }
                 })
                 .catch(err => {
-                    console.log('Live sync tick', err);
+                    console.debug('Live sync fallback tick', err);
                 });
         }
 
-        // Start live sync cycle
-        setInterval(fetchLiveAntrian, 3000);
+        setInterval(fetchLiveAntrian, 5000);
     </script>
 </x-layouts.app>
