@@ -35,4 +35,18 @@ class DaftarPoli extends Model
     {
         return $this->hasMany(Periksa::class, 'id_daftar_poli');
     }
+
+    /**
+     * Scope query to only include active or uncompleted registrations.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('status_periksa', '!=', 'selesai')
+                ->orWhereDoesntHave('periksa')
+                ->orWhereHas('periksa', function ($sub) {
+                    $sub->where('status_pembayaran', '!=', 'lunas');
+                });
+        });
+    }
 }

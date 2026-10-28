@@ -21,13 +21,7 @@ class DaftarPoliController extends Controller
         // Check if patient has an active (ongoing) queue/registration
         $activePendaftaran = DaftarPoli::with(['jadwalPeriksa.dokter.poli', 'periksa'])
             ->where('id_pasien', $pasien->id)
-            ->where(function ($query) {
-                $query->where('status_periksa', '!=', 'selesai')
-                    ->orWhereDoesntHave('periksa')
-                    ->orWhereHas('periksa', function ($q) {
-                        $q->where('status_pembayaran', '!=', 'lunas');
-                    });
-            })
+            ->active()
             ->latest()
             ->first();
 
@@ -52,15 +46,7 @@ class DaftarPoliController extends Controller
         $pasien = Auth::user();
 
         // Constraint: Pasien tidak dapat mendaftar ke dua poli sekaligus
-        $hasActive = DaftarPoli::where('id_pasien', $pasien->id)
-            ->where(function ($query) {
-                $query->where('status_periksa', '!=', 'selesai')
-                    ->orWhereDoesntHave('periksa')
-                    ->orWhereHas('periksa', function ($q) {
-                        $q->where('status_pembayaran', '!=', 'lunas');
-                    });
-            })
-            ->exists();
+        $hasActive = DaftarPoli::where('id_pasien', $pasien->id)->active()->exists();
 
         if ($hasActive) {
             return back()->with('error', 'Anda masih memiliki antrian aktif atau pemeriksaan yang belum diselesaikan/dilunasi. Anda baru dapat mendaftar kembali setelah seluruh proses selesai.');

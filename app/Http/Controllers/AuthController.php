@@ -48,8 +48,7 @@ class AuthController extends Controller
             'password' => 'required|min:6'
         ]);
 
-        $lastPasien = User::where('role', 'pasien')->orderBy('id', 'desc')->first();
-        $lastId = $lastPasien ? $lastPasien->id + 1 : 1;
+        $lastId = (User::where('role', 'pasien')->max('id') ?? 0) + 1;
         $no_rm = date('Ym') . '-' . str_pad($lastId, 3, '0', STR_PAD_LEFT);
 
         User::create([

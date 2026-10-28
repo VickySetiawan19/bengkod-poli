@@ -35,13 +35,7 @@ class AntrianLiveController extends Controller
         if (Auth::check() && Auth::user()->role === 'pasien') {
             $activePendaftaran = DaftarPoli::with(['jadwalPeriksa.dokter.poli', 'periksa'])
                 ->where('id_pasien', Auth::id())
-                ->where(function ($query) {
-                    $query->where('status_periksa', '!=', 'selesai')
-                        ->orWhereDoesntHave('periksa')
-                        ->orWhereHas('periksa', function ($q) {
-                            $q->where('status_pembayaran', '!=', 'lunas');
-                        });
-                })
+                ->active()
                 ->latest()
                 ->first();
 
