@@ -13,8 +13,20 @@ class RoleMiddleware
     {
         $user = Auth::user();
 
-        if ($user->role !== $role) {
-            return response('Unauthorized.', 403);
+        if (!$user || $user->role !== $role) {
+            if ($user) {
+                $redirectRoute = match ($user->role) {
+                    'admin' => 'admin.dashboard',
+                    'dokter' => 'dokter.dashboard',
+                    'pasien' => 'pasien.dashboard',
+                    default => 'login',
+                };
+
+                return redirect()->route($redirectRoute)
+                    ->with('error', "Akses Ditolak: Akun Anda (" . ucfirst($user->role) . ") tidak memiliki hak akses untuk membuka halaman {$role}.");
+            }
+
+            return redirect()->route('login');
         }
 
         return $next($request);
