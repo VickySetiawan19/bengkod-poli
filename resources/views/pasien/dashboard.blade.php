@@ -1,4 +1,7 @@
 <x-layouts.app title="Dashboard Pasien & Antrian Real-Time">
+    @php
+        $periksaAktif = $activePendaftaran->periksa ?? null;
+    @endphp
     <div class="space-y-6">
         <div>
             <h1 class="text-2xl font-bold text-base-content flex items-center gap-2">
@@ -386,7 +389,7 @@
             const activeSedangDilayani = document.getElementById('activeSedangDilayani');
             const userJadwalId = '{{ $activePendaftaran->id_jadwal ?? "" }}';
             const userNoAntrian = {{ (int)($activePendaftaran->no_antrian ?? 0) }};
-            const hasUnpaidBill = {{ ($periksaAktif && $periksaAktif->status_pembayaran !== 'lunas') ? 'true' : 'false' }};
+            const hasUnpaidBill = {{ (!empty($periksaAktif) && ($periksaAktif->status_pembayaran ?? '') !== 'lunas') ? 'true' : 'false' }};
 
             if (activeSedangDilayani && userJadwalId == jadwalId) {
                 const newActiveServed = '#' + antrianSekarang;
