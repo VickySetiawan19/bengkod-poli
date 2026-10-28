@@ -81,30 +81,52 @@
 
                         {{-- Status Message / Action --}}
                         <div class="mt-4 pt-4 border-t border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                            <div class="flex items-center gap-2" id="queueStatusMessage">
-                                @php
-                                    $currentServedNum = (int)($jadwalAktif->antrian_sekarang ?? 0);
-                                    $userQueueNum = (int)($activePendaftaran->no_antrian ?? 0);
-                                    $isCalled = $activePendaftaran->status_periksa === 'sedang_diperiksa' || ($currentServedNum === $userQueueNum && $userQueueNum > 0);
-                                    $isPassed = $currentServedNum > $userQueueNum && $userQueueNum > 0;
-                                @endphp
+                            @php
+                                $currentServedNum = (int)($jadwalAktif->antrian_sekarang ?? 0);
+                                $userQueueNum = (int)($activePendaftaran->no_antrian ?? 0);
+                                $isCalled = $activePendaftaran->status_periksa === 'sedang_diperiksa' || ($currentServedNum === $userQueueNum && $userQueueNum > 0);
+                                $isPassed = $currentServedNum > $userQueueNum && $userQueueNum > 0;
+                            @endphp
 
-                                @if($periksaAktif && $periksaAktif->status_pembayaran !== 'lunas')
-                                    <i class="fas fa-circle-info text-warning" id="queueStatusIcon"></i>
-                                    <span id="queueStatusText">Pemeriksaan selesai. Menunggu pelunasan pembayaran tagihan periksa.</span>
-                                @elseif($isCalled)
-                                    <i class="fas fa-bullhorn text-warning animate-bounce" id="queueStatusIcon"></i>
-                                    <span id="queueStatusText" class="font-semibold text-warning-content bg-warning/20 px-2 py-0.5 rounded-md">
-                                        Nomor antrian Anda sedang dipanggil dokter! Silakan segera masuk ke ruang periksa.
-                                    </span>
-                                @elseif($isPassed)
-                                    <i class="fas fa-circle-exclamation text-error" id="queueStatusIcon"></i>
-                                    <span id="queueStatusText">Nomor antrian Anda telah terlewat dari giliran saat ini. Silakan konfirmasi ke petugas poli.</span>
-                                @else
-                                    <i class="fas fa-circle-info text-warning" id="queueStatusIcon"></i>
-                                    <span id="queueStatusText">Mohon menunggu di ruang tunggu poliklinik hingga nomor antrian Anda dipanggil.</span>
-                                @endif
+                            <div id="queueStatusBox" class="flex-1 w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-300 {{ $isCalled ? 'bg-amber-400 text-slate-950 border-amber-300 shadow-lg' : ($isPassed ? 'bg-rose-500/20 text-rose-100 border-rose-400/30' : 'bg-white/10 text-white/90 border-white/15') }}">
+                                <div id="queueStatusIconWrapper" class="shrink-0 flex items-center justify-center {{ $isCalled ? 'w-8 h-8 rounded-lg bg-amber-500/30 text-slate-950' : '' }}">
+                                    @if($periksaAktif && $periksaAktif->status_pembayaran !== 'lunas')
+                                        <i class="fas fa-circle-info text-amber-300 text-sm" id="queueStatusIcon"></i>
+                                    @elseif($isCalled)
+                                        <i class="fas fa-bullhorn text-slate-950 text-base animate-bounce" id="queueStatusIcon"></i>
+                                    @elseif($isPassed)
+                                        <i class="fas fa-circle-exclamation text-rose-300 text-sm" id="queueStatusIcon"></i>
+                                    @else
+                                        <i class="fas fa-clock text-amber-300 text-sm" id="queueStatusIcon"></i>
+                                    @endif
+                                </div>
+
+                                <div class="flex-1" id="queueStatusContent">
+                                    @if($periksaAktif && $periksaAktif->status_pembayaran !== 'lunas')
+                                        <span id="queueStatusText" class="font-medium text-white">
+                                            Pemeriksaan selesai. Menunggu pelunasan pembayaran tagihan periksa.
+                                        </span>
+                                    @elseif($isCalled)
+                                        <div id="queueStatusText" class="space-y-0.5">
+                                            <span class="font-black text-slate-950 text-xs sm:text-sm tracking-wide block uppercase">
+                                                📢 GILIRAN ANDA DIPANGGIL DOKTER!
+                                            </span>
+                                            <span class="text-slate-900 font-semibold text-[11px] sm:text-xs block">
+                                                Nomor antrian Anda (<strong>#{{ $activePendaftaran->no_antrian }}</strong>) sedang dilayani. Silakan segera masuk ke ruang periksa.
+                                            </span>
+                                        </div>
+                                    @elseif($isPassed)
+                                        <span id="queueStatusText" class="font-medium text-rose-100">
+                                            Nomor antrian Anda telah terlewat dari giliran saat ini. Silakan konfirmasi ke petugas poli.
+                                        </span>
+                                    @else
+                                        <span id="queueStatusText" class="font-medium text-white/90">
+                                            Mohon menunggu di ruang tunggu poliklinik hingga nomor antrian Anda dipanggil.
+                                        </span>
+                                    @endif
+                                </div>
                             </div>
+
                             @if($periksaAktif && $periksaAktif->status_pembayaran !== 'lunas')
                                 <a href="{{ route('pasien.pembayaran.index') }}" class="btn btn-warning btn-xs rounded-full font-bold gap-1 shadow-2xs whitespace-nowrap active:scale-[0.98] transition">
                                     <i class="fas fa-wallet text-[11px]"></i> Bayar Sekarang &rarr;
@@ -402,26 +424,47 @@
 
                 // Dynamically update status message if patient does not have finished unpaid bill
                 if (!hasUnpaidBill && userNoAntrian > 0) {
-                    const statusIcon = document.getElementById('queueStatusIcon');
-                    const statusText = document.getElementById('queueStatusText');
+                    const statusBox = document.getElementById('queueStatusBox');
+                    const statusContent = document.getElementById('queueStatusContent');
+                    const iconWrapper = document.getElementById('queueStatusIconWrapper');
                     const currentServedNum = parseInt(antrianSekarang, 10);
 
-                    if (statusText && statusIcon) {
+                    if (statusBox && statusContent && iconWrapper) {
                         if (currentServedNum === userNoAntrian) {
                             if (wasChanged) {
                                 playCallingChime();
                             }
-                            statusIcon.className = 'fas fa-bullhorn text-warning animate-bounce';
-                            statusText.className = 'font-semibold text-warning-content bg-warning/20 px-2 py-0.5 rounded-md';
-                            statusText.textContent = 'Nomor antrian Anda sedang dipanggil dokter! Silakan segera masuk ke ruang periksa.';
+                            statusBox.className = 'flex-1 w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-300 bg-amber-400 text-slate-950 border-amber-300 shadow-lg';
+                            iconWrapper.className = 'shrink-0 flex items-center justify-center w-8 h-8 rounded-lg bg-amber-500/30 text-slate-950';
+                            iconWrapper.innerHTML = '<i class="fas fa-bullhorn text-slate-950 text-base animate-bounce" id="queueStatusIcon"></i>';
+                            statusContent.innerHTML = `
+                                <div id="queueStatusText" class="space-y-0.5">
+                                    <span class="font-black text-slate-950 text-xs sm:text-sm tracking-wide block uppercase">
+                                        📢 GILIRAN ANDA DIPANGGIL DOKTER!
+                                    </span>
+                                    <span class="text-slate-900 font-semibold text-[11px] sm:text-xs block">
+                                        Nomor antrian Anda (<strong>#${userNoAntrian}</strong>) sedang dilayani. Silakan segera masuk ke ruang periksa.
+                                    </span>
+                                </div>
+                            `;
                         } else if (currentServedNum > userNoAntrian) {
-                            statusIcon.className = 'fas fa-circle-exclamation text-error';
-                            statusText.className = '';
-                            statusText.textContent = 'Nomor antrian Anda telah terlewat dari giliran saat ini. Silakan konfirmasi ke petugas poli.';
+                            statusBox.className = 'flex-1 w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-300 bg-rose-500/20 text-rose-100 border-rose-400/30';
+                            iconWrapper.className = 'shrink-0 flex items-center justify-center';
+                            iconWrapper.innerHTML = '<i class="fas fa-circle-exclamation text-rose-300 text-sm" id="queueStatusIcon"></i>';
+                            statusContent.innerHTML = `
+                                <span id="queueStatusText" class="font-medium text-rose-100">
+                                    Nomor antrian Anda telah terlewat dari giliran saat ini. Silakan konfirmasi ke petugas poli.
+                                </span>
+                            `;
                         } else {
-                            statusIcon.className = 'fas fa-circle-info text-warning';
-                            statusText.className = '';
-                            statusText.textContent = 'Mohon menunggu di ruang tunggu poliklinik hingga nomor antrian Anda dipanggil.';
+                            statusBox.className = 'flex-1 w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-300 bg-white/10 text-white/90 border-white/15';
+                            iconWrapper.className = 'shrink-0 flex items-center justify-center';
+                            iconWrapper.innerHTML = '<i class="fas fa-clock text-amber-300 text-sm" id="queueStatusIcon"></i>';
+                            statusContent.innerHTML = `
+                                <span id="queueStatusText" class="font-medium text-white/90">
+                                    Mohon menunggu di ruang tunggu poliklinik hingga nomor antrian Anda dipanggil.
+                                </span>
+                            `;
                         }
                     }
                 }
