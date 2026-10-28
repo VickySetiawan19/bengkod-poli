@@ -40,6 +40,13 @@ class AntrianLiveController extends Controller
                 ->first();
 
             if ($activePendaftaran) {
+                // Auto sync status_periksa if queue number is actively being served
+                $currentServed = (int) ($activePendaftaran->jadwalPeriksa->antrian_sekarang ?? 0);
+                if ($currentServed === (int) $activePendaftaran->no_antrian && $activePendaftaran->status_periksa === 'menunggu') {
+                    $activePendaftaran->update(['status_periksa' => 'sedang_diperiksa']);
+                    $activePendaftaran->status_periksa = 'sedang_diperiksa';
+                }
+
                 $userActiveQueue = [
                     'id' => $activePendaftaran->id,
                     'no_antrian' => (int) $activePendaftaran->no_antrian,

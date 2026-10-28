@@ -53,6 +53,12 @@ class PeriksaPasienController extends Controller
             'antrian_sekarang' => $request->no_antrian,
         ]);
 
+        // Auto update status_periksa to 'sedang_diperiksa' for the called queue number
+        DaftarPoli::where('id_jadwal', $jadwal->id)
+            ->where('no_antrian', $request->no_antrian)
+            ->where('status_periksa', 'menunggu')
+            ->update(['status_periksa' => 'sedang_diperiksa']);
+
         // Broadcast real-time update
         event(new AntrianUpdated($jadwal));
 
@@ -77,6 +83,10 @@ class PeriksaPasienController extends Controller
         if ($jadwal->antrian_sekarang < $daftarPoli->no_antrian) {
             $jadwal->update(['antrian_sekarang' => $daftarPoli->no_antrian]);
             event(new AntrianUpdated($jadwal));
+        }
+
+        if ($daftarPoli->status_periksa === 'menunggu') {
+            $daftarPoli->update(['status_periksa' => 'sedang_diperiksa']);
         }
 
         return view('dokter.periksa_pasien.create', compact('daftarPoli', 'obats'));

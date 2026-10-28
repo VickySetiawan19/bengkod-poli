@@ -25,6 +25,14 @@ class DaftarPoliController extends Controller
             ->latest()
             ->first();
 
+        if ($activePendaftaran) {
+            $currentServed = (int) ($activePendaftaran->jadwalPeriksa->antrian_sekarang ?? 0);
+            if ($currentServed === (int) $activePendaftaran->no_antrian && $activePendaftaran->status_periksa === 'menunggu') {
+                $activePendaftaran->update(['status_periksa' => 'sedang_diperiksa']);
+                $activePendaftaran->status_periksa = 'sedang_diperiksa';
+            }
+        }
+
         // Active schedules of all doctors for the queue table
         $jadwals = JadwalPeriksa::with(['dokter.poli'])
             ->where('status', 'aktif')

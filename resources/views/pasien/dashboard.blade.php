@@ -78,14 +78,28 @@
 
                         {{-- Status Message / Action --}}
                         <div class="mt-4 pt-4 border-t border-white/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                            <div class="flex items-center gap-2">
-                                <i class="fas fa-circle-info text-warning"></i>
+                            <div class="flex items-center gap-2" id="queueStatusMessage">
+                                @php
+                                    $currentServedNum = (int)($jadwalAktif->antrian_sekarang ?? 0);
+                                    $userQueueNum = (int)($activePendaftaran->no_antrian ?? 0);
+                                    $isCalled = $activePendaftaran->status_periksa === 'sedang_diperiksa' || ($currentServedNum === $userQueueNum && $userQueueNum > 0);
+                                    $isPassed = $currentServedNum > $userQueueNum && $userQueueNum > 0;
+                                @endphp
+
                                 @if($periksaAktif && $periksaAktif->status_pembayaran !== 'lunas')
-                                    <span>Pemeriksaan selesai. Menunggu pelunasan pembayaran tagihan periksa.</span>
-                                @elseif($activePendaftaran->status_periksa === 'sedang_diperiksa')
-                                    <span>Nomor Anda sedang dipanggil / diperiksa oleh dokter di ruang praktik.</span>
+                                    <i class="fas fa-circle-info text-warning" id="queueStatusIcon"></i>
+                                    <span id="queueStatusText">Pemeriksaan selesai. Menunggu pelunasan pembayaran tagihan periksa.</span>
+                                @elseif($isCalled)
+                                    <i class="fas fa-bullhorn text-warning animate-bounce" id="queueStatusIcon"></i>
+                                    <span id="queueStatusText" class="font-semibold text-warning-content bg-warning/20 px-2 py-0.5 rounded-md">
+                                        Nomor antrian Anda sedang dipanggil dokter! Silakan segera masuk ke ruang periksa.
+                                    </span>
+                                @elseif($isPassed)
+                                    <i class="fas fa-circle-exclamation text-error" id="queueStatusIcon"></i>
+                                    <span id="queueStatusText">Nomor antrian Anda telah terlewat dari giliran saat ini. Silakan konfirmasi ke petugas poli.</span>
                                 @else
-                                    <span>Mohon menunggu di ruang tunggu poliklinik hingga nomor antrian Anda dipanggil.</span>
+                                    <i class="fas fa-circle-info text-warning" id="queueStatusIcon"></i>
+                                    <span id="queueStatusText">Mohon menunggu di ruang tunggu poliklinik hingga nomor antrian Anda dipanggil.</span>
                                 @endif
                             </div>
                             @if($periksaAktif && $periksaAktif->status_pembayaran !== 'lunas')
@@ -327,6 +341,33 @@
             }
         });
 
+        // Audio Chime notification using Web Audio API (offline & zero dependencies)
+        function playCallingChime() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, now); // D5
+                osc.frequency.setValueAtTime(880, now + 0.15); // A5
+
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.7);
+            } catch (err) {
+                // AudioContext autoplay restriction handled silently
+            }
+        }
+
         // Unified handler for updating queue number badge & banner
         function handleAntrianUpdate(jadwalId, antrianSekarang) {
             const badge = document.getElementById('antrian-sekarang-' + jadwalId);
@@ -344,12 +385,42 @@
             // Update banner active queue currently served if banner exists
             const activeSedangDilayani = document.getElementById('activeSedangDilayani');
             const userJadwalId = '{{ $activePendaftaran->id_jadwal ?? "" }}';
+            const userNoAntrian = {{ (int)($activePendaftaran->no_antrian ?? 0) }};
+            const hasUnpaidBill = {{ ($periksaAktif && $periksaAktif->status_pembayaran !== 'lunas') ? 'true' : 'false' }};
+
             if (activeSedangDilayani && userJadwalId == jadwalId) {
                 const newActiveServed = '#' + antrianSekarang;
-                if (activeSedangDilayani.innerText !== newActiveServed) {
+                const wasChanged = activeSedangDilayani.innerText !== newActiveServed;
+                if (wasChanged) {
                     activeSedangDilayani.innerText = newActiveServed;
                     activeSedangDilayani.classList.add('scale-110');
                     setTimeout(() => activeSedangDilayani.classList.remove('scale-110'), 600);
+                }
+
+                // Dynamically update status message if patient does not have finished unpaid bill
+                if (!hasUnpaidBill && userNoAntrian > 0) {
+                    const statusIcon = document.getElementById('queueStatusIcon');
+                    const statusText = document.getElementById('queueStatusText');
+                    const currentServedNum = parseInt(antrianSekarang, 10);
+
+                    if (statusText && statusIcon) {
+                        if (currentServedNum === userNoAntrian) {
+                            if (wasChanged) {
+                                playCallingChime();
+                            }
+                            statusIcon.className = 'fas fa-bullhorn text-warning animate-bounce';
+                            statusText.className = 'font-semibold text-warning-content bg-warning/20 px-2 py-0.5 rounded-md';
+                            statusText.textContent = 'Nomor antrian Anda sedang dipanggil dokter! Silakan segera masuk ke ruang periksa.';
+                        } else if (currentServedNum > userNoAntrian) {
+                            statusIcon.className = 'fas fa-circle-exclamation text-error';
+                            statusText.className = '';
+                            statusText.textContent = 'Nomor antrian Anda telah terlewat dari giliran saat ini. Silakan konfirmasi ke petugas poli.';
+                        } else {
+                            statusIcon.className = 'fas fa-circle-info text-warning';
+                            statusText.className = '';
+                            statusText.textContent = 'Mohon menunggu di ruang tunggu poliklinik hingga nomor antrian Anda dipanggil.';
+                        }
+                    }
                 }
             }
         }
