@@ -40,20 +40,10 @@
                                             <i class="fas fa-bullhorn text-[10px]"></i> Panggil #{{ $nextInJadwal->no_antrian }}
                                         </button>
                                     </form>
-                                @endif
-
-                                @if(($j->antrian_sekarang ?? 0) > 0)
-                                    <form action="{{ route('periksa-pasien.call', $j->id) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="no_antrian" value="{{ $j->antrian_sekarang }}">
-                                        <button type="submit" class="btn btn-xs btn-ghost border border-base-300 gap-1 text-[11px]" title="Panggil Ulang Nomor Ini">
-                                            <i class="fas fa-rotate-right text-[10px]"></i> Ulang #{{ $j->antrian_sekarang }}
-                                        </button>
-                                    </form>
-                                @endif
-
-                                @if(!$nextInJadwal && ($j->antrian_sekarang ?? 0) > 0)
-                                    <span class="text-[11px] text-base-content/50 italic">Semua Antrian Selesai</span>
+                                @else
+                                    <span class="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
+                                        <i class="fas fa-check-circle"></i> Selesai
+                                    </span>
                                 @endif
                             </div>
                         </div>
@@ -126,20 +116,16 @@
                                             </a>
                                         @else
                                             <div class="flex items-center justify-end gap-1.5 whitespace-nowrap">
-                                                {{-- Tombol Panggil dari Baris Pasien --}}
-                                                <form action="{{ route('periksa-pasien.call', $antrian->id_jadwal) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    <input type="hidden" name="no_antrian" value="{{ $antrian->no_antrian }}">
-                                                    @if($isCurrentlyServed)
-                                                        <button type="submit" class="btn btn-warning btn-xs rounded-lg font-bold gap-1 shadow-2xs" title="Panggil Ulang Pasien Ini">
-                                                            <i class="fas fa-rotate-right text-[10px]"></i> Panggil Ulang
-                                                        </button>
-                                                    @else
+                                                @if(!$isCurrentlyServed)
+                                                    {{-- Tombol Panggil dari Baris Pasien --}}
+                                                    <form action="{{ route('periksa-pasien.call', $antrian->id_jadwal) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        <input type="hidden" name="no_antrian" value="{{ $antrian->no_antrian }}">
                                                         <button type="submit" class="btn btn-ghost btn-xs rounded-lg border border-base-300 font-semibold gap-1 hover:bg-warning hover:text-warning-content hover:border-warning transition" title="Panggil Pasien Ini">
                                                             <i class="fas fa-bullhorn text-[10px]"></i> Panggil
                                                         </button>
-                                                    @endif
-                                                </form>
+                                                    </form>
+                                                @endif
 
                                                 {{-- Tombol Buka Periksa --}}
                                                 <a href="{{ route('periksa-pasien.create', $antrian->id) }}" class="btn btn-xs btn-primary rounded-lg text-white font-medium gap-1.5 shadow-2xs whitespace-nowrap hover:shadow transition" title="Buka Formulir Pemeriksaan Medis">

@@ -69,7 +69,7 @@
                             @endphp
 
                             <div class="flex flex-col gap-2 w-full sm:w-auto min-w-[210px]">
-                                {{-- 1. Tombol Panggil Berikutnya (Hanya jika ada pasien terdaftar berikutnya) --}}
+                                {{-- Tombol Panggil Berikutnya (Hanya jika ada pasien terdaftar berikutnya) --}}
                                 @if($nextWaitingPatient)
                                     <form action="{{ route('periksa-pasien.call', $activeJadwal->id) }}" method="POST">
                                         @csrf
@@ -78,23 +78,9 @@
                                             <i class="fas fa-bullhorn text-xs"></i> Panggil #{{ $nextWaitingPatient->no_antrian }} ({{ Str::limit($nextWaitingPatient->pasien->nama ?? 'Pasien', 12) }})
                                         </button>
                                     </form>
-                                @endif
-
-                                {{-- 2. Tombol Panggil Ulang (Jika nomor saat ini valid) --}}
-                                @if(($activeJadwal->antrian_sekarang ?? 0) > 0)
-                                    <form action="{{ route('periksa-pasien.call', $activeJadwal->id) }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="no_antrian" value="{{ $activeJadwal->antrian_sekarang }}">
-                                        <button type="submit" class="btn btn-ghost btn-xs text-white border border-white/25 hover:bg-white/10 gap-1.5 w-full">
-                                            <i class="fas fa-rotate-right text-[11px]"></i> Panggil Ulang #{{ $activeJadwal->antrian_sekarang }}
-                                        </button>
-                                    </form>
-                                @endif
-
-                                {{-- 3. Indikator Jika Antrian Habis / Tidak Ada Pasien Menunggu --}}
-                                @if(!$nextWaitingPatient)
-                                    <div class="px-3 py-1.5 rounded-xl bg-white/10 text-white/80 text-xs font-semibold flex items-center justify-center gap-1.5 border border-white/10 text-center">
-                                        <i class="fas fa-check-circle text-emerald-400"></i> Tidak Ada Pasien Menunggu
+                                @else
+                                    <div class="px-4 py-2.5 rounded-xl bg-white/10 text-white/90 text-xs font-semibold flex items-center justify-center gap-2 border border-white/15 text-center">
+                                        <i class="fas fa-check-circle text-emerald-400"></i> Semua Antrian Selesai
                                     </div>
                                 @endif
                             </div>
@@ -235,20 +221,16 @@
                                     </td>
                                     <td class="px-5 py-3 text-right">
                                         <div class="flex items-center justify-end gap-1.5">
-                                            {{-- Tombol Panggil dari Baris Tabel Pasien --}}
-                                            <form action="{{ route('periksa-pasien.call', $antrian->id_jadwal) }}" method="POST" class="inline">
-                                                @csrf
-                                                <input type="hidden" name="no_antrian" value="{{ $antrian->no_antrian }}">
-                                                @if($isCurrentlyServed)
-                                                    <button type="submit" class="btn btn-warning btn-xs rounded-lg font-bold gap-1 shadow-2xs" title="Panggil Ulang Pasien Ini">
-                                                        <i class="fas fa-rotate-right text-[10px]"></i> Panggil Ulang
-                                                    </button>
-                                                @else
+                                            @if(!$isCurrentlyServed)
+                                                {{-- Tombol Panggil dari Baris Tabel Pasien --}}
+                                                <form action="{{ route('periksa-pasien.call', $antrian->id_jadwal) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    <input type="hidden" name="no_antrian" value="{{ $antrian->no_antrian }}">
                                                     <button type="submit" class="btn btn-ghost btn-xs rounded-lg border border-base-300 font-semibold gap-1 hover:bg-warning hover:text-warning-content hover:border-warning transition" title="Panggil Pasien Ini">
                                                         <i class="fas fa-bullhorn text-[10px]"></i> Panggil
                                                     </button>
-                                                @endif
-                                            </form>
+                                                </form>
+                                            @endif
 
                                             {{-- Tombol Buka Periksa --}}
                                             <a href="{{ route('periksa-pasien.create', $antrian->id) }}" class="btn btn-primary btn-xs rounded-lg font-semibold gap-1 shadow-2xs" title="Periksa Medis Pasien">
