@@ -49,20 +49,32 @@ class PeriksaPasienController extends Controller
             'no_antrian' => 'required|integer|min:0',
         ]);
 
+        $noAntrian = (int) $request->no_antrian;
+
+        // Validation: Verify that the called queue number actually exists in this schedule
+        $targetPendaftaran = DaftarPoli::with('pasien')
+            ->where('id_jadwal', $jadwal->id)
+            ->where('no_antrian', $noAntrian)
+            ->first();
+
+        if ($noAntrian > 0 && !$targetPendaftaran) {
+            return back()->with('error', "Nomor antrian #{$noAntrian} belum terdaftar pada jadwal praktik ini.");
+        }
+
         $jadwal->update([
-            'antrian_sekarang' => $request->no_antrian,
+            'antrian_sekarang' => $noAntrian,
         ]);
 
         // Auto update status_periksa to 'sedang_diperiksa' for the called queue number
-        DaftarPoli::where('id_jadwal', $jadwal->id)
-            ->where('no_antrian', $request->no_antrian)
-            ->where('status_periksa', 'menunggu')
-            ->update(['status_periksa' => 'sedang_diperiksa']);
+        if ($targetPendaftaran && $targetPendaftaran->status_periksa === 'menunggu') {
+            $targetPendaftaran->update(['status_periksa' => 'sedang_diperiksa']);
+        }
 
         // Broadcast real-time update
         event(new AntrianUpdated($jadwal));
 
-        return back()->with('success', "Nomor antrian yang sedang dilayani berhasil diperbarui ke #{$request->no_antrian}.");
+        $namaPasien = $targetPendaftaran && $targetPendaftaran->pasien ? " ({$targetPendaftaran->pasien->nama})" : '';
+        return back()->with('success', "Nomor antrian #{$noAntrian}{$namaPasien} berhasil dipanggil.");
     }
 
     /**

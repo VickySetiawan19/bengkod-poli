@@ -91,7 +91,7 @@ Route::middleware(['auth', 'role:dokter'])->prefix('dokter')->group(function () 
             ->whereIn('id_jadwal', $jadwalIds)
             ->where('status_periksa', '!=', 'selesai')
             ->orderBy('no_antrian')
-            ->take(5)
+            ->take(15)
             ->get();
 
         $recentSelesai = \App\Models\Periksa::with(['daftarPoli.pasien'])

@@ -61,17 +61,43 @@
 
                             <div class="hidden sm:block h-12 w-[1px] bg-white/20"></div>
 
-                            {{-- Panggil Form --}}
-                            <form action="{{ route('periksa-pasien.call', $activeJadwal->id) }}" method="POST" class="flex flex-col gap-2 w-full sm:w-auto">
-                                @csrf
-                                <input type="hidden" name="no_antrian" value="{{ ($activeJadwal->antrian_sekarang ?? 0) + 1 }}">
-                                <button type="submit" class="btn btn-warning btn-sm font-bold gap-2 shadow-md hover:scale-[1.02] active:scale-[0.98] transition">
-                                    <i class="fas fa-bullhorn text-xs"></i> Panggil Berikutnya (#{{ ($activeJadwal->antrian_sekarang ?? 0) + 1 }})
-                                </button>
-                                <a href="{{ route('periksa-pasien.index') }}" class="btn btn-ghost btn-xs text-white hover:bg-white/10">
-                                    Pilih Nomor Manual &rarr;
-                                </a>
-                            </form>
+                            @php
+                                $nextWaitingPatient = $antrianAktifList->where('no_antrian', '>', $activeJadwal->antrian_sekarang)->where('status_periksa', '!=', 'selesai')->first();
+                                if (!$nextWaitingPatient && ($activeJadwal->antrian_sekarang ?? 0) === 0) {
+                                    $nextWaitingPatient = $antrianAktifList->where('status_periksa', '!=', 'selesai')->first();
+                                }
+                            @endphp
+
+                            <div class="flex flex-col gap-2 w-full sm:w-auto min-w-[210px]">
+                                {{-- 1. Tombol Panggil Berikutnya (Hanya jika ada pasien terdaftar berikutnya) --}}
+                                @if($nextWaitingPatient)
+                                    <form action="{{ route('periksa-pasien.call', $activeJadwal->id) }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="no_antrian" value="{{ $nextWaitingPatient->no_antrian }}">
+                                        <button type="submit" class="btn btn-warning btn-sm font-bold gap-2 shadow-md hover:scale-[1.02] active:scale-[0.98] transition w-full">
+                                            <i class="fas fa-bullhorn text-xs"></i> Panggil #{{ $nextWaitingPatient->no_antrian }} ({{ Str::limit($nextWaitingPatient->pasien->nama ?? 'Pasien', 12) }})
+                                        </button>
+                                    </form>
+                                @endif
+
+                                {{-- 2. Tombol Panggil Ulang (Jika nomor saat ini valid) --}}
+                                @if(($activeJadwal->antrian_sekarang ?? 0) > 0)
+                                    <form action="{{ route('periksa-pasien.call', $activeJadwal->id) }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="no_antrian" value="{{ $activeJadwal->antrian_sekarang }}">
+                                        <button type="submit" class="btn btn-ghost btn-xs text-white border border-white/25 hover:bg-white/10 gap-1.5 w-full">
+                                            <i class="fas fa-rotate-right text-[11px]"></i> Panggil Ulang #{{ $activeJadwal->antrian_sekarang }}
+                                        </button>
+                                    </form>
+                                @endif
+
+                                {{-- 3. Indikator Jika Antrian Habis / Tidak Ada Pasien Menunggu --}}
+                                @if(!$nextWaitingPatient)
+                                    <div class="px-3 py-1.5 rounded-xl bg-white/10 text-white/80 text-xs font-semibold flex items-center justify-center gap-1.5 border border-white/10 text-center">
+                                        <i class="fas fa-check-circle text-emerald-400"></i> Tidak Ada Pasien Menunggu
+                                    </div>
+                                @endif
+                            </div>
                         </div>
 
                     </div>
@@ -182,7 +208,10 @@
                         </thead>
                         <tbody class="text-sm divide-y divide-base-200">
                             @forelse($antrianAktifList as $antrian)
-                                <tr class="hover:bg-base-200/30 transition">
+                                @php
+                                    $isCurrentlyServed = (int)($activeJadwal->antrian_sekarang ?? 0) === (int)$antrian->no_antrian;
+                                @endphp
+                                <tr class="transition {{ $isCurrentlyServed ? 'bg-primary/5 border-l-4 border-primary' : 'hover:bg-base-200/30' }}">
                                     <td class="px-5 py-3 font-mono font-black text-lg text-primary">
                                         #{{ $antrian->no_antrian }}
                                     </td>
@@ -194,16 +223,38 @@
                                         {{ $antrian->keluhan }}
                                     </td>
                                     <td class="px-5 py-3">
-                                        @if($antrian->status_periksa === 'sedang_diperiksa')
-                                            <span class="badge badge-warning badge-sm">Sedang Diperiksa</span>
+                                        @if($isCurrentlyServed)
+                                            <span class="badge badge-warning badge-sm font-bold gap-1 animate-pulse">
+                                                <i class="fas fa-bullhorn text-[10px]"></i> Dipanggil
+                                            </span>
+                                        @elseif($antrian->status_periksa === 'sedang_diperiksa')
+                                            <span class="badge badge-info badge-sm">Diperiksa</span>
                                         @else
                                             <span class="badge badge-ghost badge-sm">Menunggu</span>
                                         @endif
                                     </td>
                                     <td class="px-5 py-3 text-right">
-                                        <a href="{{ route('periksa-pasien.create', $antrian->id) }}" class="btn btn-primary btn-xs rounded-lg font-semibold gap-1 shadow-2xs">
-                                            <i class="fas fa-stethoscope text-[10px]"></i> Periksa
-                                        </a>
+                                        <div class="flex items-center justify-end gap-1.5">
+                                            {{-- Tombol Panggil dari Baris Tabel Pasien --}}
+                                            <form action="{{ route('periksa-pasien.call', $antrian->id_jadwal) }}" method="POST" class="inline">
+                                                @csrf
+                                                <input type="hidden" name="no_antrian" value="{{ $antrian->no_antrian }}">
+                                                @if($isCurrentlyServed)
+                                                    <button type="submit" class="btn btn-warning btn-xs rounded-lg font-bold gap-1 shadow-2xs" title="Panggil Ulang Pasien Ini">
+                                                        <i class="fas fa-rotate-right text-[10px]"></i> Panggil Ulang
+                                                    </button>
+                                                @else
+                                                    <button type="submit" class="btn btn-ghost btn-xs rounded-lg border border-base-300 font-semibold gap-1 hover:bg-warning hover:text-warning-content hover:border-warning transition" title="Panggil Pasien Ini">
+                                                        <i class="fas fa-bullhorn text-[10px]"></i> Panggil
+                                                    </button>
+                                                @endif
+                                            </form>
+
+                                            {{-- Tombol Buka Periksa --}}
+                                            <a href="{{ route('periksa-pasien.create', $antrian->id) }}" class="btn btn-primary btn-xs rounded-lg font-semibold gap-1 shadow-2xs" title="Periksa Medis Pasien">
+                                                <i class="fas fa-stethoscope text-[10px]"></i> Periksa
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
